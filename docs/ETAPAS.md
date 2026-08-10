@@ -7,7 +7,7 @@
 - [x] Etapa 5 — Layout administrativo e navegação
 - [x] Etapa 6 — Dashboard operacional
 - [x] Etapa 7 — Cadastro e gestão de agendamentos
-- [ ] Etapa 8 — Motoristas, veículos e terminais
+- [x] Etapa 8 — Motoristas, veículos e terminais
 - [ ] Etapa 9 — API Node.js e regras de negócio
 - [ ] Etapa 10 — PostgreSQL, autenticação e integração
 - [ ] Etapa 11 — Testes, documentação e publicação

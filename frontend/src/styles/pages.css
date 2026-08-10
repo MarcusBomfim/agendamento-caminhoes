@@ -1,0 +1,126 @@
+.module-page {
+  min-height: calc(100vh - var(--header-height) - 120px);
+}
+
+.module-heading {
+  max-width: 650px;
+}
+
+.module-heading > span,
+.login-eyebrow {
+  color: var(--blue);
+  font-size: 0.63rem;
+  font-weight: 850;
+  letter-spacing: 0.16em;
+}
+
+.module-heading h2 {
+  margin: 10px 0 9px;
+  color: var(--text);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1.06;
+}
+
+.module-heading p {
+  margin-bottom: 0;
+  color: var(--text-soft);
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.module-placeholder {
+  min-height: 290px;
+  margin-top: 34px;
+  padding: 40px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  background:
+    radial-gradient(circle at 50% 110%, rgba(20, 116, 184, 0.11), transparent 22rem),
+    var(--surface);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.module-icon,
+.login-logo {
+  width: 63px;
+  height: 63px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #c9dfed;
+  border-radius: 18px;
+  background: var(--blue-pale);
+  color: var(--blue);
+}
+
+.module-placeholder strong {
+  display: block;
+  margin-top: 19px;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.module-placeholder p {
+  max-width: 430px;
+  margin: 7px 0 0;
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.login-placeholder {
+  width: min(calc(100% - 36px), 470px);
+  min-height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.login-placeholder .login-logo {
+  margin-bottom: 21px;
+  background: var(--navy);
+  color: #82c9f0;
+}
+
+.login-placeholder h1 {
+  margin: 12px 0 9px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.5rem;
+  font-weight: 500;
+  letter-spacing: -0.045em;
+}
+
+.login-placeholder p {
+  color: var(--text-soft);
+  font-size: 0.84rem;
+  line-height: 1.65;
+}
+
+.login-placeholder a {
+  min-height: 48px;
+  margin-top: 18px;
+  padding: 0 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 11px;
+  background: var(--blue);
+  color: white;
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.login-placeholder a:hover {
+  background: var(--blue-dark);
+}
+

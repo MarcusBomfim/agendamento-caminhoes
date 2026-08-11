@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import type { AuthenticatedUser } from "../../modules/auth/auth.types.ts";
+import type { AuthenticatedUser, UserRole } from "../../modules/auth/auth.types.ts";
 
 export type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE";
 
@@ -24,4 +24,5 @@ export interface Route {
   path: string;
   handler: RouteHandler;
   protected?: boolean;
+  roles?: UserRole[];
 }

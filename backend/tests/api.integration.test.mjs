@@ -26,7 +26,7 @@ after(async () => {
   await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
 });
 
-const authorizedHeaders = () => ({ Authorization: `Bearer ${token}`, "Content-Type": "application/json" });
+const authorizedHeaders = (accessToken = token) => ({ Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" });
 
 test("expõe o endpoint público de saúde", async () => {
   const { response, body } = await request("/api/health");
@@ -42,9 +42,70 @@ test("recusa credenciais inválidas", async () => {
 test("protege os dados operacionais", async () => {
   const anonymous = await request("/api/drivers");
   assert.equal(anonymous.response.status, 401);
+  const anonymousUsers = await request("/api/users");
+  assert.equal(anonymousUsers.response.status, 401);
   const authenticated = await request("/api/auth/me", { headers: authorizedHeaders() });
   assert.equal(authenticated.response.status, 200);
   assert.equal(authenticated.body.data.email, "admin@portoagenda.com");
+});
+
+test("cadastra usuários com senha protegida e restringe a administração", async () => {
+  const weakPassword = await request("/api/users", {
+    method: "POST",
+    headers: authorizedHeaders(),
+    body: JSON.stringify({ name: "Senha Fraca", email: "fraco@portoagenda.com", password: "senhafraca", role: "OPERATOR" }),
+  });
+  assert.equal(weakPassword.response.status, 400);
+
+  const created = await request("/api/users", {
+    method: "POST",
+    headers: authorizedHeaders(),
+    body: JSON.stringify({ name: "Novo Operador", email: "novo.operador@portoagenda.com", password: "Operador@2027", role: "OPERATOR" }),
+  });
+  assert.equal(created.response.status, 201);
+  assert.equal(created.body.data.email, "novo.operador@portoagenda.com");
+  assert.equal(created.body.data.active, true);
+  assert.equal("password" in created.body.data, false);
+  assert.equal("passwordHash" in created.body.data, false);
+
+  const duplicate = await request("/api/users", {
+    method: "POST",
+    headers: authorizedHeaders(),
+    body: JSON.stringify({ name: "E-mail Repetido", email: "NOVO.OPERADOR@PORTOAGENDA.COM", password: "Operador@2028", role: "OPERATOR" }),
+  });
+  assert.equal(duplicate.response.status, 409);
+
+  const operatorLogin = await request("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "novo.operador@portoagenda.com", password: "Operador@2027" }),
+  });
+  assert.equal(operatorLogin.response.status, 200);
+  const operatorToken = operatorLogin.body.data.token;
+
+  const forbidden = await request("/api/users", { headers: authorizedHeaders(operatorToken) });
+  assert.equal(forbidden.response.status, 403);
+
+  const disabled = await request(`/api/users/${created.body.data.id}/status`, {
+    method: "PATCH",
+    headers: authorizedHeaders(),
+    body: JSON.stringify({ active: false }),
+  });
+  assert.equal(disabled.response.status, 200);
+  assert.equal(disabled.body.data.active, false);
+
+  const disabledSession = await request("/api/drivers", { headers: authorizedHeaders(operatorToken) });
+  assert.equal(disabledSession.response.status, 401);
+});
+
+test("impede que o administrador desative a própria conta", async () => {
+  const me = await request("/api/auth/me", { headers: authorizedHeaders() });
+  const response = await request(`/api/users/${me.body.data.id}/status`, {
+    method: "PATCH",
+    headers: authorizedHeaders(),
+    body: JSON.stringify({ active: false }),
+  });
+  assert.equal(response.response.status, 422);
 });
 
 test("lista os cadastros iniciais", async () => {

@@ -25,7 +25,7 @@ Serviços locais:
 | Saúde da API | `http://localhost:3333/api/health` |
 | PostgreSQL | `localhost:5432` |
 
-As migrações são executadas automaticamente pelo contêiner do PostgreSQL na criação inicial do volume.
+As migrações são aplicadas automaticamente pelo serviço `migrations` antes da API, inclusive quando o volume do PostgreSQL já existe.
 
 Para encerrar os serviços:
 
@@ -40,6 +40,7 @@ Esse comando preserva os dados. A remoção do volume só deve ser feita quando 
 - Use HTTPS no front-end e na API.
 - Armazene senhas, URL do banco e chave JWT em variáveis secretas da plataforma.
 - Troque o usuário e a senha demonstrativos antes da primeira publicação.
+- Crie contas individuais e mantenha a função de administrador apenas para quem gerencia acessos.
 - Restrinja `FRONTEND_URL` ao endereço real da interface.
 - Ative `DATABASE_SSL=true` quando o provedor PostgreSQL exigir conexão segura.
 - Utilize um banco gerenciado com backups automáticos.

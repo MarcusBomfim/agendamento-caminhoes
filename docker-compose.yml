@@ -12,7 +12,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./database/migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-porto_agenda}"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-porto_agenda}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -34,13 +34,34 @@ services:
     ports:
       - "3333:3333"
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:3333/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 10s
       timeout: 5s
       retries: 10
+
+  migrations:
+    image: postgres:16-alpine
+    environment:
+      PGDATABASE: ${POSTGRES_DB:-porto_agenda}
+      PGUSER: ${POSTGRES_USER:-postgres}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGHOST: postgres
+    volumes:
+      - ./database/migrations:/migrations:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        for file in /migrations/*.sql; do
+          echo "Aplicando $${file}"
+          psql -v ON_ERROR_STOP=1 -f "$${file}"
+        done
 
   frontend:
     build:

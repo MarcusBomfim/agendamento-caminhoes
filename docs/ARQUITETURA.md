@@ -32,8 +32,9 @@ A API está organizada em módulos dentro de `backend/src/modules`. Cada módulo
 
 - Zod valida variáveis de ambiente e dados recebidos.
 - JWT identifica a sessão do operador.
-- bcrypt compara senhas sem armazená-las em texto puro no banco.
+- bcrypt gera e compara hashes de senha com fator de custo 12 nos novos cadastros, sem armazenar a senha original.
 - A camada de serviço aplica conflitos de agenda, validade da CNH, situação do veículo, capacidade do terminal e transições de status.
+- O cadastro e a gestão de usuários exigem função `ADMIN`, verificada novamente no servidor.
 
 ## Dados
 
@@ -48,3 +49,9 @@ Sem uma conexão configurada, o sistema usa repositórios em memória. Esse modo
 3. O front-end envia o token nas rotas protegidas.
 4. A API valida assinatura e expiração antes de liberar o recurso.
 5. Uma resposta `401` encerra a sessão inválida no navegador.
+
+## Proteção das senhas
+
+As senhas não são criptografadas de forma reversível. Antes de salvar um novo usuário, a API aplica bcrypt com um salt individual e armazena somente o hash. No login, bcrypt compara a senha informada com esse hash. Assim, nem a interface nem os endpoints administrativos recebem a senha armazenada.
+
+A validação exige no mínimo 10 caracteres, letras maiúscula e minúscula, número e caractere especial. O limite de 72 bytes evita o truncamento silencioso característico do bcrypt.

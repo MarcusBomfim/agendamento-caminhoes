@@ -19,6 +19,29 @@ Envie o token nas rotas protegidas:
 Authorization: Bearer SEU_TOKEN
 ```
 
+## Usuários
+
+Essas rotas exigem uma sessão com função `ADMIN`.
+
+| Método | Endpoint | Descrição |
+| --- | --- | --- |
+| GET | `/api/users` | Lista os usuários sem retornar senhas ou hashes |
+| POST | `/api/users` | Cadastra um usuário |
+| PATCH | `/api/users/:id/status` | Ativa ou desativa um usuário |
+
+### Exemplo de cadastro
+
+```json
+{
+  "name": "Novo Operador",
+  "email": "operador@portoagenda.com",
+  "password": "Operador@2027",
+  "role": "OPERATOR"
+}
+```
+
+A senha deve ter pelo menos 10 caracteres, com letras maiúscula e minúscula, número e caractere especial. A API transforma a senha em hash bcrypt antes da persistência e nunca devolve o hash nas respostas.
+
 ### Exemplo de login
 
 ```json
@@ -102,6 +125,7 @@ PENDENTE, CONFIRMADO ou ATRASADO -> CANCELADO
 - `201`: registro criado.
 - `400`: dados enviados são inválidos.
 - `401`: autenticação ausente, inválida ou expirada.
+- `403`: usuário autenticado sem permissão para o recurso.
 - `404`: recurso não encontrado.
 - `409`: conflito de horário ou duplicidade.
 - `422`: regra de negócio não atendida.

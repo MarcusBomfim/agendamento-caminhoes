@@ -8,6 +8,8 @@ import { DriversPage } from "../features/drivers/pages/DriversPage";
 import { TerminalsPage } from "../features/terminals/pages/TerminalsPage";
 import { VehiclesPage } from "../features/vehicles/pages/VehiclesPage";
 import { ProtectedRoute } from "../features/auth/ProtectedRoute";
+import { AdminRoute } from "../features/auth/AdminRoute";
+import { UsersPage } from "../features/users/pages/UsersPage";
 
 export function AppRoutes() {
   return (
@@ -21,6 +23,9 @@ export function AppRoutes() {
           <Route path="/motoristas" element={<DriversPage />} />
           <Route path="/veiculos" element={<VehiclesPage />} />
           <Route path="/terminais" element={<TerminalsPage />} />
+          <Route element={<AdminRoute />}>
+            <Route path="/usuarios" element={<UsersPage />} />
+          </Route>
         </Route>
       </Route>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />

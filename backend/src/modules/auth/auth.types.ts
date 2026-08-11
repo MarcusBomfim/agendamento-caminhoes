@@ -10,3 +10,11 @@ export interface User {
 }
 
 export type AuthenticatedUser = Omit<User, "passwordHash" | "active">;
+export type ManagedUser = AuthenticatedUser & Pick<User, "active">;
+
+export interface NewUser {
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+}

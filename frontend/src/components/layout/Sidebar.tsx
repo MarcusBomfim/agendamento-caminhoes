@@ -31,7 +31,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
         <div className="sidebar-section-label">OPERAÇÃO</div>
         <nav className="sidebar-navigation">
-          {navigationItems.map(({ label, path, icon: Icon, end }) => (
+          {navigationItems.filter((item) => !item.adminOnly || user?.role === "ADMIN").map(({ label, path, icon: Icon, end }) => (
             <NavLink
               key={path}
               to={path}

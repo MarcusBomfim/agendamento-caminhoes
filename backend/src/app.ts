@@ -47,6 +47,7 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
       const authorization = request.headers.authorization;
       if (!authorization?.startsWith("Bearer ")) throw new AppError(401, "Autenticação necessária");
       user = await authService.authenticate(authorization.slice(7));
+      if (match.route.roles && !match.route.roles.includes(user.role)) throw new AppError(403, "Acesso permitido somente para administradores");
     }
     const result = await match.route.handler({ request, response, params: match.params, query: url.searchParams, body, user });
     sendJson(response, result.status ?? 200, result.body ?? null);

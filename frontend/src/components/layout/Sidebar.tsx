@@ -1,6 +1,7 @@
 import { Anchor, LogOut, X } from "lucide-react";
 import { NavLink } from "react-router";
 import { navigationItems } from "./navigation";
+import { useAuth } from "../../features/auth/useAuth";
 
 interface SidebarProps {
   open: boolean;
@@ -8,6 +9,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ open, onClose }: SidebarProps) {
+  const { user, logout } = useAuth();
+  const initials = user?.name.split(" ").slice(0, 2).map((part) => part[0]).join("").toUpperCase() ?? "OP";
   return (
     <>
       <button
@@ -43,12 +46,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         </nav>
 
         <div className="sidebar-account">
-          <div className="account-avatar" aria-hidden="true">OP</div>
-          <div><strong>Operador Portuário</strong><small>Administrador</small></div>
-          <button type="button" aria-label="Sair do sistema" title="Sair"><LogOut size={18} /></button>
+          <div className="account-avatar" aria-hidden="true">{initials}</div>
+          <div><strong>{user?.name ?? "Operador"}</strong><small>{user?.role === "ADMIN" ? "Administrador" : "Operador"}</small></div>
+          <button type="button" aria-label="Sair do sistema" title="Sair" onClick={logout}><LogOut size={18} /></button>
         </div>
       </aside>
     </>
   );
 }
-

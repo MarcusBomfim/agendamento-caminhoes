@@ -63,6 +63,9 @@
 
 .appointment-success p { margin: 0; }
 
+.api-state-banner { min-height: 42px; padding: 0 14px; display: flex; align-items: center; border: 1px solid #cbdfee; border-radius: 10px; background: #edf6fb; color: var(--blue-dark); font-size: 0.65rem; }
+.api-state-banner.is-error { border-color: #efd0d0; background: #fdf0f0; color: #b84b4b; }
+
 .appointments-list-card,
 .appointment-form {
   border: 1px solid var(--border);

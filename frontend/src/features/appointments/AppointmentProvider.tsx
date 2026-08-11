@@ -1,42 +1,29 @@
-import { useCallback, useMemo, useState, type ReactNode } from "react";
-import { initialAppointments } from "./data";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, type ReactNode } from "react";
+import { apiRequest } from "../../services/apiClient";
+import { useAuth } from "../auth/useAuth";
+import { useRegistry } from "../registries/useRegistry";
 import { AppointmentContext } from "./AppointmentContext";
-import type { Appointment, AppointmentFormValues, AppointmentStatus } from "./types";
+import type { ApiAppointment, Appointment, AppointmentFormValues, AppointmentStatus } from "./types";
 
 export function AppointmentProvider({ children }: { children: ReactNode }) {
-  const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
+  const { authenticated } = useAuth();
+  const { drivers, vehicles, terminals } = useRegistry();
+  const queryClient = useQueryClient();
+  const query = useQuery({ queryKey: ["appointments"], queryFn: () => apiRequest<ApiAppointment[]>("/appointments"), enabled: authenticated });
 
-  const createAppointment = useCallback((values: AppointmentFormValues): Appointment => {
-    const timestamp = Date.now();
-    const appointment: Appointment = {
-      id: `PA-${timestamp.toString().slice(-9)}`,
-      scheduledDate: values.scheduledDate,
-      scheduledTime: values.scheduledTime,
-      estimatedMinutes: Number(values.estimatedMinutes),
-      carrier: values.carrier,
-      driver: values.driver,
-      vehiclePlate: values.vehiclePlate,
-      terminal: values.terminal,
-      gate: values.gate,
-      operation: values.operation,
-      containerNumber: values.containerNumber,
-      status: "PENDENTE",
-      notes: values.notes,
-      createdAt: new Date().toISOString(),
-    };
+  const mapAppointment = useCallback((item: ApiAppointment): Appointment => ({
+    ...item,
+    driver: drivers.find((driver) => driver.id === item.driverId)?.name ?? item.driverId,
+    vehiclePlate: vehicles.find((vehicle) => vehicle.id === item.vehicleId)?.plate ?? item.vehicleId,
+    terminal: terminals.find((terminal) => terminal.id === item.terminalId)?.name ?? item.terminalId,
+  }), [drivers, vehicles, terminals]);
 
-    setAppointments((current) => [appointment, ...current]);
-    return appointment;
-  }, []);
+  const createMutation = useMutation({ mutationFn: (values: AppointmentFormValues) => apiRequest<ApiAppointment>("/appointments", { method: "POST", body: JSON.stringify({ ...values, estimatedMinutes: Number(values.estimatedMinutes) }) }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ["appointments"] }) });
+  const appointments = useMemo(() => (query.data ?? []).map(mapAppointment), [query.data, mapAppointment]);
+  const createAppointment = useCallback(async (values: AppointmentFormValues) => mapAppointment(await createMutation.mutateAsync(values)), [createMutation, mapAppointment]);
+  const updateAppointmentStatus = useCallback(async (id: string, status: AppointmentStatus) => { await apiRequest(`/appointments/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }); await queryClient.invalidateQueries({ queryKey: ["appointments"] }); }, [queryClient]);
 
-  const updateAppointmentStatus = useCallback((id: string, status: AppointmentStatus) => {
-    setAppointments((current) => current.map((item) => item.id === id ? { ...item, status } : item));
-  }, []);
-
-  const value = useMemo(
-    () => ({ appointments, createAppointment, updateAppointmentStatus }),
-    [appointments, createAppointment, updateAppointmentStatus],
-  );
-
+  const value = useMemo(() => ({ appointments, isLoading: query.isLoading, error: query.error instanceof Error ? query.error.message : "", createAppointment, updateAppointmentStatus }), [appointments, query.isLoading, query.error, createAppointment, updateAppointmentStatus]);
   return <AppointmentContext.Provider value={value}>{children}</AppointmentContext.Provider>;
 }

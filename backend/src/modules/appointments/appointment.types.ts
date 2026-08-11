@@ -16,9 +16,10 @@ export interface Appointment {
   status: AppointmentStatus;
   notes: string;
   createdAt: string;
+  createdBy?: string;
 }
 
-export type NewAppointment = Omit<Appointment, "id" | "status" | "createdAt">;
+export type NewAppointment = Omit<Appointment, "id" | "status" | "createdAt" | "createdBy">;
 
 export interface AppointmentFilters {
   status?: AppointmentStatus;

@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 import { env } from "./config/env.ts";
 import { handleRequest } from "./app.ts";
+import { closeDatabase } from "./database/client.ts";
 
 const server = createServer(handleRequest);
 
@@ -10,7 +11,7 @@ server.listen(env.PORT, () => {
 
 function shutdown(signal: string) {
   console.log(`Encerrando servidor após ${signal}`);
-  server.close(() => process.exit(0));
+  server.close(async () => { await closeDatabase(); process.exit(0); });
 }
 
 process.on("SIGINT", () => shutdown("SIGINT"));

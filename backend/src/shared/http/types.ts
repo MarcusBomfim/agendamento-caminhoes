@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { AuthenticatedUser } from "../../modules/auth/auth.types.ts";
 
 export type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE";
 
@@ -8,6 +9,7 @@ export interface RequestContext {
   params: Record<string, string>;
   query: URLSearchParams;
   body: unknown;
+  user?: AuthenticatedUser;
 }
 
 export interface HandlerResult {
@@ -21,4 +23,5 @@ export interface Route {
   method: HttpMethod;
   path: string;
   handler: RouteHandler;
+  protected?: boolean;
 }

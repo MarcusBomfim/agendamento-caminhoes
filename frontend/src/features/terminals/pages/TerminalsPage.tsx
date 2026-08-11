@@ -24,7 +24,7 @@ const terminalSchema = z.object({
 const defaultValues: TerminalFormValues = { name: "", code: "", location: "", gates: "", openingTime: "06:00", closingTime: "22:00", hourlyCapacity: "" };
 
 export function TerminalsPage() {
-  const { terminals, createTerminal, toggleTerminalStatus } = useRegistry();
+  const { terminals, isLoading, error, createTerminal, toggleTerminalStatus } = useRegistry();
   const [formOpen, setFormOpen] = useState(false);
   const [search, setSearch] = useState("");
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<TerminalFormValues>({ resolver: zodResolver(terminalSchema), defaultValues });
@@ -35,11 +35,12 @@ export function TerminalsPage() {
   }, [terminals, search]);
 
   const closeForm = () => { reset(defaultValues); setFormOpen(false); };
-  const submit = (values: TerminalFormValues) => { createTerminal({ ...values, code: values.code.toUpperCase() }); closeForm(); };
+  const submit = async (values: TerminalFormValues) => { await createTerminal({ ...values, code: values.code.toUpperCase() }); closeForm(); };
 
   return (
     <section className="registry-page">
       <RegistryPageHeader eyebrow="CONFIGURAÇÕES" title="Terminais e janelas" description="Configure portões, horários de operação e capacidade de atendimento." icon={Warehouse} count={terminals.length} activeCount={terminals.filter((item) => item.status !== "INATIVO").length} activeLabel="Terminais habilitados" formOpen={formOpen} onToggleForm={() => formOpen ? closeForm() : setFormOpen(true)} />
+      {isLoading && <div className="api-state-banner">Carregando terminais da API...</div>}{error && <div className="api-state-banner is-error">{error}</div>}
 
       {formOpen && <RegistryFormPanel title="Cadastrar terminal" description="Configure a localização e os limites operacionais do novo terminal." onCancel={closeForm}>
         <form onSubmit={handleSubmit(submit)} noValidate><div className="registry-form-grid">

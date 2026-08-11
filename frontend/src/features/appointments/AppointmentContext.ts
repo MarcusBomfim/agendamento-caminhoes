@@ -3,9 +3,10 @@ import type { Appointment, AppointmentFormValues, AppointmentStatus } from "./ty
 
 export interface AppointmentContextValue {
   appointments: Appointment[];
-  createAppointment: (values: AppointmentFormValues) => Appointment;
-  updateAppointmentStatus: (id: string, status: AppointmentStatus) => void;
+  isLoading: boolean;
+  error: string;
+  createAppointment: (values: AppointmentFormValues) => Promise<Appointment>;
+  updateAppointmentStatus: (id: string, status: AppointmentStatus) => Promise<void>;
 }
 
 export const AppointmentContext = createContext<AppointmentContextValue | undefined>(undefined);
-

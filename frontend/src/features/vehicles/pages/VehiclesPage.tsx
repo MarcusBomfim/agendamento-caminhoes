@@ -23,7 +23,7 @@ const vehicleSchema = z.object({
 const defaultValues: VehicleFormValues = { plate: "", type: "", model: "", carrier: "", renavam: "", capacityTons: "" };
 
 export function VehiclesPage() {
-  const { vehicles, createVehicle, toggleVehicleStatus } = useRegistry();
+  const { vehicles, isLoading, error, createVehicle, toggleVehicleStatus } = useRegistry();
   const [formOpen, setFormOpen] = useState(false);
   const [search, setSearch] = useState("");
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<VehicleFormValues>({ resolver: zodResolver(vehicleSchema), defaultValues });
@@ -34,11 +34,12 @@ export function VehiclesPage() {
   }, [vehicles, search]);
 
   const closeForm = () => { reset(defaultValues); setFormOpen(false); };
-  const submit = (values: VehicleFormValues) => { createVehicle({ ...values, plate: values.plate.toUpperCase(), capacityTons: values.capacityTons.replace(",", ".") }); closeForm(); };
+  const submit = async (values: VehicleFormValues) => { await createVehicle({ ...values, plate: values.plate.toUpperCase(), capacityTons: values.capacityTons.replace(",", ".") }); closeForm(); };
 
   return (
     <section className="registry-page">
       <RegistryPageHeader eyebrow="CADASTROS" title="Frota de veículos" description="Cadastre placas, tipos de caminhão, transportadoras e documentos da frota." icon={Truck} count={vehicles.length} activeCount={vehicles.filter((item) => item.status !== "INATIVO").length} activeLabel="Veículos habilitados" formOpen={formOpen} onToggleForm={() => formOpen ? closeForm() : setFormOpen(true)} />
+      {isLoading && <div className="api-state-banner">Carregando veículos da API...</div>}{error && <div className="api-state-banner is-error">{error}</div>}
 
       {formOpen && <RegistryFormPanel title="Cadastrar veículo" description="Adicione a identificação e as características operacionais do veículo." onCancel={closeForm}>
         <form onSubmit={handleSubmit(submit)} noValidate><div className="registry-form-grid">

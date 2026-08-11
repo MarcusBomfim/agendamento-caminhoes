@@ -2,7 +2,31 @@
 
 URL local: `http://localhost:3333`
 
-As respostas usam JSON. Registros retornados ficam dentro da propriedade `data`. Nesta etapa, os dados são mantidos em memória e reiniciam junto com o servidor.
+As respostas usam JSON e os registros retornados ficam dentro da propriedade `data`.
+
+Quando `DATABASE_URL` está configurada, motoristas, veículos, terminais, usuários e agendamentos são persistidos no PostgreSQL. Sem ela, a API utiliza o modo demonstrativo em memória.
+
+## Autenticação
+
+| Método | Endpoint | Descrição |
+| --- | --- | --- |
+| POST | `/api/auth/login` | Autentica o operador e retorna o token |
+| GET | `/api/auth/me` | Retorna o usuário da sessão |
+
+Envie o token nas rotas protegidas:
+
+```text
+Authorization: Bearer SEU_TOKEN
+```
+
+### Exemplo de login
+
+```json
+{
+  "email": "admin@portoagenda.com",
+  "password": "Porto@123"
+}
+```
 
 ## Saúde da aplicação
 
@@ -25,7 +49,7 @@ Filtros disponíveis na listagem: `status`, `date` e `terminalId`.
 
 ```json
 {
-  "scheduledDate": "2026-08-12",
+  "scheduledDate": "2027-02-18",
   "scheduledTime": "09:00",
   "estimatedMinutes": 45,
   "carrier": "Rota Litoral",
@@ -77,6 +101,7 @@ PENDENTE, CONFIRMADO ou ATRASADO -> CANCELADO
 - `200`: operação concluída.
 - `201`: registro criado.
 - `400`: dados enviados são inválidos.
+- `401`: autenticação ausente, inválida ou expirada.
 - `404`: recurso não encontrado.
 - `409`: conflito de horário ou duplicidade.
 - `422`: regra de negócio não atendida.

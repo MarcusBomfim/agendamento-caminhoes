@@ -5,12 +5,14 @@ export interface RegistryContextValue {
   drivers: Driver[];
   vehicles: Vehicle[];
   terminals: Terminal[];
-  createDriver: (values: DriverFormValues) => Driver;
-  createVehicle: (values: VehicleFormValues) => Vehicle;
-  createTerminal: (values: TerminalFormValues) => Terminal;
-  toggleDriverStatus: (id: string) => void;
-  toggleVehicleStatus: (id: string) => void;
-  toggleTerminalStatus: (id: string) => void;
+  isLoading: boolean;
+  error: string;
+  createDriver: (values: DriverFormValues) => Promise<Driver>;
+  createVehicle: (values: VehicleFormValues) => Promise<Vehicle>;
+  createTerminal: (values: TerminalFormValues) => Promise<Terminal>;
+  toggleDriverStatus: (id: string) => Promise<void>;
+  toggleVehicleStatus: (id: string) => Promise<void>;
+  toggleTerminalStatus: (id: string) => Promise<void>;
 }
 
 export const RegistryContext = createContext<RegistryContextValue | null>(null);

@@ -24,7 +24,7 @@ const driverSchema = z.object({
 const defaultValues: DriverFormValues = { name: "", cpf: "", cnh: "", cnhCategory: "", cnhExpiresAt: "", phone: "", carrier: "" };
 
 export function DriversPage() {
-  const { drivers, createDriver, toggleDriverStatus } = useRegistry();
+  const { drivers, isLoading, error, createDriver, toggleDriverStatus } = useRegistry();
   const [formOpen, setFormOpen] = useState(false);
   const [search, setSearch] = useState("");
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<DriverFormValues>({ resolver: zodResolver(driverSchema), defaultValues });
@@ -35,11 +35,12 @@ export function DriversPage() {
   }, [drivers, search]);
 
   const closeForm = () => { reset(defaultValues); setFormOpen(false); };
-  const submit = (values: DriverFormValues) => { createDriver(values); closeForm(); };
+  const submit = async (values: DriverFormValues) => { await createDriver(values); closeForm(); };
 
   return (
     <section className="registry-page">
       <RegistryPageHeader eyebrow="CADASTROS" title="Motoristas autorizados" description="Mantenha documentos, contatos e situação dos motoristas atualizados." icon={UsersRound} count={drivers.length} activeCount={drivers.filter((item) => item.status === "ATIVO").length} activeLabel="Motoristas ativos" formOpen={formOpen} onToggleForm={() => formOpen ? closeForm() : setFormOpen(true)} />
+      {isLoading && <div className="api-state-banner">Carregando motoristas da API...</div>}{error && <div className="api-state-banner is-error">{error}</div>}
 
       {formOpen && <RegistryFormPanel title="Cadastrar motorista" description="Preencha os dados pessoais e a habilitação do profissional." onCancel={closeForm}>
         <form onSubmit={handleSubmit(submit)} noValidate><div className="registry-form-grid">

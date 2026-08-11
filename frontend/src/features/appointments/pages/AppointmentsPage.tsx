@@ -17,7 +17,7 @@ function normalize(value: string) {
 }
 
 export function AppointmentsPage() {
-  const { appointments, updateAppointmentStatus } = useAppointments();
+  const { appointments, isLoading, error, updateAppointmentStatus } = useAppointments();
   const location = useLocation();
   const [filters, setFilters] = useState<AppointmentFilterValues>(emptyFilters);
   const createdId = (location.state as { createdId?: string } | null)?.createdId;
@@ -52,6 +52,8 @@ export function AppointmentsPage() {
       </div>
 
       {createdId && <div className="appointment-success"><CalendarDays size={18} /><p>Agendamento <strong>{createdId}</strong> criado com sucesso.</p></div>}
+      {isLoading && <div className="api-state-banner">Carregando agendamentos da API...</div>}
+      {error && <div className="api-state-banner is-error">{error}</div>}
 
       <div className="appointments-list-card">
         <div className="appointment-summary">
@@ -59,7 +61,7 @@ export function AppointmentsPage() {
           <strong>{filteredAppointments.length}</strong>
         </div>
         <AppointmentFilters filters={filters} onChange={setFilters} onClear={() => setFilters(emptyFilters)} />
-        <AppointmentsTable appointments={filteredAppointments} onStatusChange={updateAppointmentStatus} onClearFilters={() => setFilters(emptyFilters)} />
+        <AppointmentsTable appointments={filteredAppointments} onStatusChange={(id, status) => { void updateAppointmentStatus(id, status); }} onClearFilters={() => setFilters(emptyFilters)} />
       </div>
     </section>
   );

@@ -9,5 +9,5 @@
 - [x] Etapa 7 — Cadastro e gestão de agendamentos
 - [x] Etapa 8 — Motoristas, veículos e terminais
 - [x] Etapa 9 — API Node.js e regras de negócio
-- [ ] Etapa 10 — PostgreSQL, autenticação e integração
-- [ ] Etapa 11 — Testes, documentação e publicação
+- [x] Etapa 10 — PostgreSQL, autenticação e integração
+- [x] Etapa 11 — Testes, documentação e preparação para publicação

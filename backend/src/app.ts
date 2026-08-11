@@ -2,6 +2,8 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { ZodError } from "zod";
 import { env } from "./config/env.ts";
 import { appointmentRoutes } from "./modules/appointments/appointment.routes.ts";
+import { authRoutes } from "./modules/auth/auth.routes.ts";
+import { authService } from "./modules/auth/auth.service.ts";
 import { registryRoutes } from "./modules/registries/registry.routes.ts";
 import { AppError } from "./shared/errors/AppError.ts";
 import { readJsonBody } from "./shared/http/body.ts";
@@ -10,6 +12,7 @@ import type { Route } from "./shared/http/types.ts";
 
 const routes: Route[] = [
   { method: "GET", path: "/api/health", handler: () => ({ body: { status: "ok", service: "porto-agenda-api", timestamp: new Date().toISOString() } }) },
+  ...authRoutes,
   ...appointmentRoutes,
   ...registryRoutes,
 ];
@@ -39,7 +42,13 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
     if (!match) throw new AppError(404, "Rota não encontrada");
 
     const body = await readJsonBody(request);
-    const result = await match.route.handler({ request, response, params: match.params, query: url.searchParams, body });
+    let user;
+    if (match.route.protected) {
+      const authorization = request.headers.authorization;
+      if (!authorization?.startsWith("Bearer ")) throw new AppError(401, "Autenticação necessária");
+      user = await authService.authenticate(authorization.slice(7));
+    }
+    const result = await match.route.handler({ request, response, params: match.params, query: url.searchParams, body, user });
     sendJson(response, result.status ?? 200, result.body ?? null);
   } catch (error) {
     if (error instanceof ZodError) {

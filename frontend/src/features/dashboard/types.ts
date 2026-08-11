@@ -1,6 +1,6 @@
 export type StatIconName = "calendar" | "truck" | "completed" | "warning";
 export type StatTone = "blue" | "teal" | "green" | "orange";
-export type AppointmentStatus = "CONFIRMADO" | "EM PÁTIO" | "ATRASADO" | "AGUARDANDO";
+export type AppointmentStatus = "PENDENTE" | "CONFIRMADO" | "EM PÁTIO" | "CONCLUÍDO" | "ATRASADO" | "CANCELADO";
 export type AlertTone = "warning" | "info" | "success";
 
 export interface DashboardStat {
@@ -43,4 +43,3 @@ export interface OperationAlert {
   time: string;
   tone: AlertTone;
 }
-

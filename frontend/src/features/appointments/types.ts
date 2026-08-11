@@ -18,17 +18,22 @@ export interface Appointment {
   createdAt: string;
 }
 
+export interface ApiAppointment extends Omit<Appointment, "driver" | "vehiclePlate" | "terminal"> {
+  driverId: string;
+  vehicleId: string;
+  terminalId: string;
+}
+
 export interface AppointmentFormValues {
   scheduledDate: string;
   scheduledTime: string;
   estimatedMinutes: "30" | "45" | "60" | "90";
   carrier: string;
-  driver: string;
-  vehiclePlate: string;
-  terminal: string;
+  driverId: string;
+  vehicleId: string;
+  terminalId: string;
   gate: string;
   operation: OperationType;
   containerNumber: string;
   notes: string;
 }
-

@@ -356,6 +356,8 @@
   overflow-x: auto;
 }
 
+.dashboard-empty-row { padding: 24px; color: var(--text-faint); font-size: 0.65rem; text-align: center; }
+
 .appointments-table {
   width: 100%;
   border-collapse: collapse;

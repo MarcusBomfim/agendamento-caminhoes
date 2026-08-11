@@ -1,6 +1,6 @@
-import { statusSummary } from "../data";
+import type { StatusSummary } from "../types";
 
-export function StatusPanel() {
+export function StatusPanel({ statusSummary }: { statusSummary: StatusSummary[] }) {
   const total = statusSummary.reduce((sum, status) => sum + status.value, 0);
 
   return (
@@ -13,4 +13,3 @@ export function StatusPanel() {
     </section>
   );
 }
-

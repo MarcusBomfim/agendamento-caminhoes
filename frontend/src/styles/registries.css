@@ -241,22 +241,6 @@
 .registry-row-action:hover { background: var(--blue-pale); color: var(--blue); }
 .registry-row-action:disabled { cursor: not-allowed; opacity: 0.42; }
 
-.security-notice {
-  padding: 14px 17px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid #bcdcca;
-  border-radius: 11px;
-  background: #eff9f3;
-  color: #287e55;
-}
-
-.security-notice strong,
-.security-notice span { display: block; }
-.security-notice strong { font-size: 0.68rem; }
-.security-notice span { margin-top: 3px; color: #5a7566; font-size: 0.58rem; }
-
 .password-input { position: relative; }
 .password-input input { padding-right: 42px; }
 .password-input button { position: absolute; top: 50%; right: 7px; width: 31px; height: 31px; display: grid; place-items: center; transform: translateY(-50%); border: 0; background: transparent; color: var(--text-soft); }

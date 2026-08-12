@@ -10,11 +10,15 @@ import { VehiclesPage } from "../features/vehicles/pages/VehiclesPage";
 import { ProtectedRoute } from "../features/auth/ProtectedRoute";
 import { AdminRoute } from "../features/auth/AdminRoute";
 import { UsersPage } from "../features/users/pages/UsersPage";
+import { ForgotPasswordPage } from "../features/auth/pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "../features/auth/pages/ResetPasswordPage";
 
 export function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/recuperar-senha" element={<ForgotPasswordPage />} />
+      <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />

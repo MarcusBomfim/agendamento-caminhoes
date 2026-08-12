@@ -55,3 +55,13 @@ Sem uma conexão configurada, o sistema usa repositórios em memória. Esse modo
 As senhas não são criptografadas de forma reversível. Antes de salvar um novo usuário, a API aplica bcrypt com um salt individual e armazena somente o hash. No login, bcrypt compara a senha informada com esse hash. Assim, nem a interface nem os endpoints administrativos recebem a senha armazenada.
 
 A validação exige no mínimo 10 caracteres, letras maiúscula e minúscula, número e caractere especial. O limite de 72 bytes evita o truncamento silencioso característico do bcrypt.
+
+## Recuperação de senha
+
+1. O usuário informa o e-mail sem receber confirmação sobre a existência da conta.
+2. A API gera 32 bytes aleatórios e envia o token somente no link de recuperação.
+3. O PostgreSQL armazena apenas o hash SHA-256 do token, com validade de 30 minutos.
+4. Na redefinição, o token é consumido de forma atômica e não pode ser reutilizado.
+5. A nova senha recebe hash bcrypt e a versão de sessão do usuário é incrementada, invalidando JWTs anteriores.
+
+Solicitações repetidas têm intervalo mínimo configurável. O envio por e-mail utiliza SMTP quando configurado; somente ambientes locais podem expor o link diretamente para facilitar testes.

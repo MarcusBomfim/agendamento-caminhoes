@@ -108,6 +108,78 @@ test("impede que o administrador desative a própria conta", async () => {
   assert.equal(response.response.status, 422);
 });
 
+test("redefine a senha com token temporário de uso único", async () => {
+  const created = await request("/api/users", {
+    method: "POST",
+    headers: authorizedHeaders(),
+    body: JSON.stringify({ name: "Operador Recuperação", email: "recuperacao@portoagenda.com", password: "SenhaAntiga@2027", role: "OPERATOR" }),
+  });
+  assert.equal(created.response.status, 201);
+
+  const previousLogin = await request("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "recuperacao@portoagenda.com", password: "SenhaAntiga@2027" }),
+  });
+  assert.equal(previousLogin.response.status, 200);
+
+  const unknownEmail = await request("/api/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "nao-existe@portoagenda.com" }),
+  });
+  assert.equal(unknownEmail.response.status, 200);
+  assert.match(unknownEmail.body.data.message, /Se o e-mail estiver cadastrado/);
+
+  const recovery = await request("/api/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "recuperacao@portoagenda.com" }),
+  });
+  assert.equal(recovery.response.status, 200);
+  const resetUrl = new URL(recovery.body.data.resetUrl);
+  const resetToken = resetUrl.searchParams.get("token");
+  assert.equal(resetToken?.length, 64);
+
+  const weakPassword = await request("/api/auth/reset-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: resetToken, password: "senhafraca" }),
+  });
+  assert.equal(weakPassword.response.status, 400);
+
+  const reset = await request("/api/auth/reset-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: resetToken, password: "SenhaNova@2028" }),
+  });
+  assert.equal(reset.response.status, 200);
+
+  const reused = await request("/api/auth/reset-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: resetToken, password: "OutraSenha@2029" }),
+  });
+  assert.equal(reused.response.status, 400);
+
+  const previousSession = await request("/api/drivers", { headers: authorizedHeaders(previousLogin.body.data.token) });
+  assert.equal(previousSession.response.status, 401);
+
+  const oldPassword = await request("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "recuperacao@portoagenda.com", password: "SenhaAntiga@2027" }),
+  });
+  assert.equal(oldPassword.response.status, 401);
+
+  const newPassword = await request("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "recuperacao@portoagenda.com", password: "SenhaNova@2028" }),
+  });
+  assert.equal(newPassword.response.status, 200);
+});
+
 test("lista os cadastros iniciais", async () => {
   const [drivers, vehicles, terminals] = await Promise.all([
     request("/api/drivers", { headers: authorizedHeaders() }),

@@ -144,6 +144,21 @@
 .login-form-panel form > button:hover { background: var(--blue-dark); }
 .login-form-panel form > button:disabled { opacity: 0.7; cursor: wait; }
 .login-error { margin-top: 14px; padding: 10px 12px; border: 1px solid #efd0d0; border-radius: 8px; background: #fdf0f0; color: #b84b4b; font-size: 0.62rem; }
+.login-success { margin-top: 18px; padding: 14px; display: grid; gap: 5px; border: 1px solid #bcdcca; border-radius: 9px; background: #eff9f3; color: #287e55; }
+.login-success strong { font-size: 0.68rem; }
+.login-success span { color: #5a7566; font-size: 0.61rem; line-height: 1.5; }
+.login-password-tools { margin-top: 10px; display: flex; justify-content: flex-end; }
+.login-password-tools a,
+.login-back-link,
+.local-recovery-link { color: var(--blue); font-size: 0.61rem; font-weight: 750; text-decoration: none; }
+.login-password-tools a:hover,
+.login-back-link:hover,
+.local-recovery-link:hover { text-decoration: underline; }
+.login-back-link,
+.local-recovery-link { margin-top: 18px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.local-recovery-link { min-height: 42px; padding: 0 12px; border: 1px solid #b9d8eb; border-radius: 9px; background: var(--blue-pale); }
+.login-show-password { width: 29px; height: 29px; display: grid; flex: 0 0 29px; place-items: center; border: 0; background: transparent; color: var(--text-soft); }
+.login-password-rules { margin-top: 12px; color: var(--text-soft); font-size: 0.57rem; line-height: 1.5; }
 .demo-credentials { margin-top: 20px; padding: 12px; display: grid; gap: 4px; border-radius: 9px; background: var(--surface-soft); text-align: center; }
 .demo-credentials strong { color: var(--text-soft); font-size: 0.58rem; }
 .demo-credentials span { color: var(--text-faint); font-size: 0.56rem; }

@@ -7,9 +7,10 @@ export interface User {
   passwordHash: string;
   role: UserRole;
   active: boolean;
+  tokenVersion: number;
 }
 
-export type AuthenticatedUser = Omit<User, "passwordHash" | "active">;
+export type AuthenticatedUser = Pick<User, "id" | "name" | "email" | "role">;
 export type ManagedUser = AuthenticatedUser & Pick<User, "active">;
 
 export interface NewUser {
@@ -17,4 +18,13 @@ export interface NewUser {
   email: string;
   password: string;
   role: UserRole;
+}
+
+export interface PasswordResetToken {
+  id: string;
+  userId: string;
+  tokenHash: string;
+  expiresAt: Date;
+  usedAt?: Date;
+  createdAt: Date;
 }

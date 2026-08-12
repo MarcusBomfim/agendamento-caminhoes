@@ -1,9 +1,11 @@
 import { compare, hash } from "bcryptjs";
+import { createHash, randomBytes } from "node:crypto";
 import jwt, { type SignOptions } from "jsonwebtoken";
 import { env } from "../../config/env.ts";
 import { AppError } from "../../shared/errors/AppError.ts";
 import { createId } from "../../shared/utils/createId.ts";
 import { authRepository } from "./auth.repository.ts";
+import { sendPasswordResetEmail } from "./password-reset-email.service.ts";
 import type { AuthenticatedUser, ManagedUser, NewUser, User } from "./auth.types.ts";
 
 function publicUser(user: User): AuthenticatedUser {
@@ -23,7 +25,7 @@ export class AuthService {
     const user = await authRepository.findByEmail(email);
     if (!user || !user.active || !(await compare(password, user.passwordHash))) throw new AppError(401, "E-mail ou senha inválidos");
 
-    const token = jwt.sign({ role: user.role, email: user.email }, env.JWT_SECRET, {
+    const token = jwt.sign({ role: user.role, email: user.email, version: user.tokenVersion }, env.JWT_SECRET, {
       subject: user.id,
       expiresIn: env.JWT_EXPIRES_IN as SignOptions["expiresIn"],
       issuer: "porto-agenda-api",
@@ -36,7 +38,7 @@ export class AuthService {
       const payload = jwt.verify(token, env.JWT_SECRET, { issuer: "porto-agenda-api" });
       if (typeof payload === "string" || !payload.sub) throw new Error("Token sem usuário");
       const user = await authRepository.findById(payload.sub);
-      if (!user || !user.active) throw new Error("Usuário inativo");
+      if (!user || !user.active || payload.version !== user.tokenVersion) throw new Error("Sessão revogada");
       return publicUser(user);
     } catch {
       throw new AppError(401, "Sessão inválida ou expirada");
@@ -59,6 +61,7 @@ export class AuthService {
       passwordHash: await hash(input.password, 12),
       role: input.role,
       active: true,
+      tokenVersion: 0,
     };
 
     try {
@@ -75,6 +78,37 @@ export class AuthService {
     const user = await authRepository.updateActive(id, active);
     if (!user) throw new AppError(404, "Usuário não encontrado");
     return managedUser(user);
+  }
+
+  async requestPasswordReset(email: string) {
+    const response = { message: "Se o e-mail estiver cadastrado, você receberá as instruções para redefinir sua senha." };
+    const user = await authRepository.findByEmail(email);
+    if (!user?.active) return response;
+
+    const cooldownStart = new Date(Date.now() - env.PASSWORD_RESET_COOLDOWN_SECONDS * 1_000);
+    if (await authRepository.hasRecentResetToken(user.id, cooldownStart)) return response;
+
+    const rawToken = randomBytes(32).toString("hex");
+    const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+    const expiresAt = new Date(Date.now() + env.PASSWORD_RESET_EXPIRES_MINUTES * 60_000);
+    await authRepository.createResetToken({ id: createId("RST"), userId: user.id, tokenHash, expiresAt, createdAt: new Date() });
+
+    const resetUrl = new URL("/redefinir-senha", env.FRONTEND_URL);
+    resetUrl.searchParams.set("token", rawToken);
+    try {
+      await sendPasswordResetEmail(user.email, user.name, resetUrl.toString());
+    } catch (error) {
+      console.error("Falha ao enviar e-mail de recuperação", error);
+    }
+
+    return env.NODE_ENV !== "production" || env.PASSWORD_RESET_EXPOSE_LINK ? { ...response, resetUrl: resetUrl.toString() } : response;
+  }
+
+  async resetPassword(token: string, password: string) {
+    const tokenHash = createHash("sha256").update(token).digest("hex");
+    const changed = await authRepository.resetPassword(tokenHash, await hash(password, 12));
+    if (!changed) throw new AppError(400, "O link de recuperação é inválido ou expirou");
+    return { message: "Senha redefinida com sucesso. Entre novamente com sua nova senha." };
   }
 }
 

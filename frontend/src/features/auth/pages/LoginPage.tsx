@@ -1,7 +1,8 @@
-import { Anchor, ArrowRight, LockKeyhole, Mail } from "lucide-react";
+import { ArrowRight, LockKeyhole, Mail } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router";
+import { Link, Navigate, useLocation, useNavigate } from "react-router";
 import { ApiError } from "../../../services/apiClient";
+import { AuthPageShell } from "../components/AuthPageShell";
 import { useAuth } from "../useAuth";
 
 export function LoginPage() {
@@ -31,15 +32,15 @@ export function LoginPage() {
   };
 
   return (
-    <main className="login-page">
-      <section className="login-brand-panel"><div><span className="login-brand-icon"><Anchor size={27} /></span><strong>PORTO AGENDA</strong></div><div className="login-message"><span>GESTÃO PORTUÁRIA</span><h1>Operações mais organizadas começam aqui.</h1><p>Controle agendamentos, motoristas, veículos e terminais em um único ambiente seguro.</p></div><small>Porto de Santos · Ambiente operacional</small></section>
-      <section className="login-form-panel"><form onSubmit={submit}><span className="login-eyebrow">ACESSO RESTRITO</span><h2>Entre na sua conta</h2><p>Use suas credenciais de operador para continuar.</p>
+    <AuthPageShell>
+      <form onSubmit={submit}><span className="login-eyebrow">ACESSO RESTRITO</span><h2>Entre na sua conta</h2><p>Use suas credenciais de operador para continuar.</p>
         <label><span>E-mail</span><div><Mail size={17} /><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required /></div></label>
         <label><span>Senha</span><div><LockKeyhole size={17} /><input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" required minLength={8} /></div></label>
+        <div className="login-password-tools"><Link to="/recuperar-senha">Esqueci minha senha</Link></div>
         {error && <div className="login-error" role="alert">{error}</div>}
         <button type="submit" disabled={submitting}>{submitting ? "Entrando..." : <>Entrar no sistema <ArrowRight size={17} /></>}</button>
         <div className="demo-credentials"><strong>Acesso demonstrativo</strong><span>admin@portoagenda.com · Porto@123</span></div>
-      </form></section>
-    </main>
+      </form>
+    </AuthPageShell>
   );
 }

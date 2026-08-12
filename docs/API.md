@@ -12,12 +12,37 @@ Quando `DATABASE_URL` está configurada, motoristas, veículos, terminais, usuá
 | --- | --- | --- |
 | POST | `/api/auth/login` | Autentica o operador e retorna o token |
 | GET | `/api/auth/me` | Retorna o usuário da sessão |
+| POST | `/api/auth/forgot-password` | Solicita um link temporário de recuperação |
+| POST | `/api/auth/reset-password` | Redefine a senha usando o token recebido |
 
 Envie o token nas rotas protegidas:
 
 ```text
 Authorization: Bearer SEU_TOKEN
 ```
+
+### Recuperação de senha
+
+Solicitação:
+
+```json
+{
+  "email": "operador@portoagenda.com"
+}
+```
+
+A resposta é a mesma para e-mails cadastrados e não cadastrados. Isso evita que terceiros descubram quais contas existem no sistema.
+
+Redefinição:
+
+```json
+{
+  "token": "TOKEN_RECEBIDO_NO_LINK",
+  "password": "NovaSenha@2028"
+}
+```
+
+O token expira, pode ser utilizado uma única vez e é salvo no banco somente como hash SHA-256. Depois da alteração, sessões anteriores do usuário são revogadas.
 
 ## Usuários
 

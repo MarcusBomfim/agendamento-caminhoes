@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Eye, EyeOff, Power, RotateCcw, ShieldCheck, UserCog } from "lucide-react";
+import { Eye, EyeOff, Power, RotateCcw, UserCog } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { RegistryFieldError, RegistryFormActions, RegistryFormPanel } from "../../registries/components/RegistryFormParts";
@@ -50,7 +50,6 @@ export function UsersPage() {
   return (
     <section className="registry-page">
       <RegistryPageHeader eyebrow="ADMINISTRAÇÃO" title="Usuários do sistema" description="Crie acessos individuais e controle quem pode utilizar a operação." icon={UserCog} count={users.length} activeCount={users.filter((item) => item.active).length} activeLabel="Usuários ativos" formOpen={formOpen} onToggleForm={() => formOpen ? closeForm() : setFormOpen(true)} />
-      <div className="security-notice"><ShieldCheck size={20} /><div><strong>Senhas protegidas</strong><span>As senhas são transformadas em hash com bcrypt e nunca são exibidas ou armazenadas em texto puro.</span></div></div>
       {usersQuery.isLoading && <div className="api-state-banner">Carregando usuários da API...</div>}
       {(usersQuery.error || actionError) && <div className="api-state-banner is-error" role="alert">{actionError || (usersQuery.error instanceof Error ? usersQuery.error.message : "Não foi possível carregar os usuários")}</div>}
 

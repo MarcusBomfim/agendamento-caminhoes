@@ -7,6 +7,7 @@ Sistema full stack para organizar o agendamento e o controle de caminhões em op
 - Autenticação de operadores com JWT.
 - Cadastro administrativo de usuários e controle de acesso por função.
 - Senhas protegidas com hash bcrypt e política de senha forte.
+- Recuperação de senha com token temporário, uso único e revogação das sessões anteriores.
 - Dashboard com indicadores da operação.
 - Cadastro, consulta e atualização de agendamentos.
 - Gestão de motoristas, veículos e terminais.

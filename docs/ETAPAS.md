@@ -12,3 +12,4 @@
 - [x] Etapa 10 — PostgreSQL, autenticação e integração
 - [x] Etapa 11 — Testes, documentação e preparação para publicação
 - [x] Etapa 12 — Cadastro de usuários, autorização administrativa e segurança de senhas
+- [x] Etapa 13 — Recuperação de senha com token temporário e revogação de sessões

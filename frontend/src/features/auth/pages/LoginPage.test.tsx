@@ -26,6 +26,7 @@ describe("LoginPage", () => {
 
     const email = screen.getByLabelText("E-mail");
     const password = screen.getByLabelText("Senha");
+    expect(screen.getByRole("link", { name: "Esqueci minha senha" })).toHaveAttribute("href", "/recuperar-senha");
 
     await user.clear(email);
     await user.type(email, "operador@portoagenda.com");

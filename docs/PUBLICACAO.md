@@ -27,6 +27,24 @@ Serviços locais:
 
 As migrações são aplicadas automaticamente pelo serviço `migrations` antes da API, inclusive quando o volume do PostgreSQL já existe.
 
+No Docker local, `PASSWORD_RESET_EXPOSE_LINK=true` apresenta o link de recuperação diretamente na tela. Isso facilita os testes sem contratar um serviço de e-mail.
+
+## E-mail de recuperação
+
+Para enviar os links por e-mail, configure no arquivo `.env`:
+
+```text
+PASSWORD_RESET_EXPOSE_LINK=false
+SMTP_HOST=smtp.seuprovedor.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=seu_usuario
+SMTP_PASSWORD=sua_senha
+SMTP_FROM=Porto Agenda <nao-responda@seudominio.com>
+```
+
+Use a porta e a opção de segurança indicadas pelo seu provedor. Em produção, mantenha `PASSWORD_RESET_EXPOSE_LINK=false`, para que o token seja entregue somente pelo e-mail do usuário.
+
 Para encerrar os serviços:
 
 ```powershell
@@ -39,6 +57,7 @@ Esse comando preserva os dados. A remoção do volume só deve ser feita quando 
 
 - Use HTTPS no front-end e na API.
 - Armazene senhas, URL do banco e chave JWT em variáveis secretas da plataforma.
+- Armazene também as credenciais SMTP como segredos e nunca as envie ao GitHub.
 - Troque o usuário e a senha demonstrativos antes da primeira publicação.
 - Crie contas individuais e mantenha a função de administrador apenas para quem gerencia acessos.
 - Restrinja `FRONTEND_URL` ao endereço real da interface.

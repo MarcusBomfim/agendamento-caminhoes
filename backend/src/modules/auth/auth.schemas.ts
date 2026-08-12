@@ -21,3 +21,12 @@ export const createUserSchema = z.object({
 });
 
 export const userStatusSchema = z.object({ active: z.boolean() });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().email("Informe um e-mail válido").max(180).transform((email) => email.toLowerCase()),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().regex(/^[a-f0-9]{64}$/i, "Token de recuperação inválido"),
+  password: strongPasswordSchema,
+});

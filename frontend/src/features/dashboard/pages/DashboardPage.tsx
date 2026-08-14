@@ -28,8 +28,14 @@ export function DashboardPage() {
     { label: "Em pátio", value: count("EM_PÁTIO"), color: "#2a9d8f" },
     { label: "Concluídos", value: count("CONCLUÍDO"), color: "#2e9d69" },
     { label: "Atrasados", value: count("ATRASADO"), color: "#e08a32" },
+    { label: "Pendentes", value: count("PENDENTE"), color: "#7c6fca" },
+    { label: "Cancelados", value: count("CANCELADO"), color: "#9aa6b2" },
   ];
-  const upcoming: UpcomingAppointment[] = appointments.filter((item) => !["CONCLUÍDO", "CANCELADO"].includes(item.status)).slice(0, 5).map((item) => ({ id: item.id, time: item.scheduledTime, carrier: item.carrier, driver: item.driver, plate: item.vehiclePlate, terminal: item.terminal, operation: item.operation === "IMPORTAÇÃO" ? "Importação" : "Exportação", status: item.status === "EM_PÁTIO" ? "EM PÁTIO" : item.status }));
+  const upcoming: UpcomingAppointment[] = appointments
+    .filter((item) => item.scheduledDate >= today && !["CONCLUÍDO", "CANCELADO"].includes(item.status))
+    .sort((a, b) => `${a.scheduledDate}T${a.scheduledTime}`.localeCompare(`${b.scheduledDate}T${b.scheduledTime}`))
+    .slice(0, 5)
+    .map((item) => ({ id: item.id, time: item.scheduledTime, carrier: item.carrier, driver: item.driver, plate: item.vehiclePlate, terminal: item.terminal, operation: item.operation === "IMPORTAÇÃO" ? "Importação" : "Exportação", status: item.status === "EM_PÁTIO" ? "EM PÁTIO" : item.status }));
 
   return <section className="dashboard-page">
     <div className="dashboard-intro"><div><span>CONTROLE OPERACIONAL</span><h2>Operação de hoje</h2><p>Acompanhe o fluxo de caminhões, as janelas disponíveis e os pontos de atenção.</p></div><div className="dashboard-actions"><button type="button" className="secondary-action"><Download size={17} /> Exportar relatório</button><Link className="primary-action" to="/agendamentos/novo"><Plus size={18} /> Novo agendamento</Link></div></div>

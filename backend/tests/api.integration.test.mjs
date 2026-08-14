@@ -180,16 +180,23 @@ test("redefine a senha com token temporário de uso único", async () => {
   assert.equal(newPassword.response.status, 200);
 });
 
-test("lista os cadastros iniciais", async () => {
-  const [drivers, vehicles, terminals] = await Promise.all([
+test("lista a base demonstrativa ampliada", async () => {
+  const [drivers, vehicles, terminals, appointments] = await Promise.all([
     request("/api/drivers", { headers: authorizedHeaders() }),
     request("/api/vehicles", { headers: authorizedHeaders() }),
     request("/api/terminals", { headers: authorizedHeaders() }),
+    request("/api/appointments", { headers: authorizedHeaders() }),
   ]);
   assert.equal(drivers.response.status, 200);
-  assert.ok(drivers.body.data.length >= 3);
-  assert.ok(vehicles.body.data.length >= 3);
-  assert.ok(terminals.body.data.length >= 3);
+  assert.ok(drivers.body.data.length >= 10);
+  assert.ok(vehicles.body.data.length >= 10);
+  assert.ok(terminals.body.data.length >= 7);
+  assert.ok(appointments.body.data.length >= 18);
+
+  const statuses = new Set(appointments.body.data.map((appointment) => appointment.status));
+  for (const status of ["PENDENTE", "CONFIRMADO", "EM_PÁTIO", "CONCLUÍDO", "ATRASADO", "CANCELADO"]) {
+    assert.equal(statuses.has(status), true);
+  }
 });
 
 test("impede motorista duplicado", async () => {

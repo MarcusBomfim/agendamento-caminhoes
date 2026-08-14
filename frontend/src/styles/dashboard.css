@@ -298,7 +298,7 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: conic-gradient(#1474b8 0 39.6%, #2a9d8f 39.6% 64.6%, #2e9d69 64.6% 93.8%, #e08a32 93.8% 100%);
+  background: #eaf0f4;
 }
 
 .status-chart > div {

@@ -14,6 +14,7 @@ Sistema full stack para organizar o agendamento e o controle de caminhões em op
 - Filtros por data, terminal e situação.
 - Validação de horários, documentos, disponibilidade e capacidade do terminal.
 - Persistência em PostgreSQL ou modo demonstrativo em memória.
+- Base demonstrativa ampliada com 10 motoristas, 10 veículos, 7 terminais e 18 agendamentos em diferentes estados operacionais.
 - Testes automatizados no front-end e na API.
 
 ## Tecnologias

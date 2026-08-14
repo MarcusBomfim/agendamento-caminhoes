@@ -5,18 +5,36 @@ const drivers: Driver[] = [
   { id: "MOT-001", name: "Carlos Mendes", cpf: "48200000011", cnh: "04829163740", cnhCategory: "E", cnhExpiresAt: "2028-03-18", phone: "(13) 99724-1840", carrier: "Rota Litoral", status: "ATIVO" },
   { id: "MOT-002", name: "Marina Souza", cpf: "72500000006", cnh: "06472819351", cnhCategory: "E", cnhExpiresAt: "2027-11-05", phone: "(13) 98851-7204", carrier: "Transmar Logística", status: "ATIVO" },
   { id: "MOT-003", name: "Paulo Ribeiro", cpf: "19300000042", cnh: "05736182940", cnhCategory: "D", cnhExpiresAt: "2026-09-22", phone: "(11) 97642-3195", carrier: "Costa Transportes", status: "BLOQUEADO" },
+  { id: "MOT-004", name: "André Lima", cpf: "91400000028", cnh: "07361529482", cnhCategory: "E", cnhExpiresAt: "2029-01-14", phone: "(13) 99102-8843", carrier: "Eixo Sul Cargas", status: "ATIVO" },
+  { id: "MOT-005", name: "Juliana Alves", cpf: "35600000070", cnh: "05928471630", cnhCategory: "D", cnhExpiresAt: "2027-06-30", phone: "(13) 99617-4521", carrier: "Navega Log", status: "INATIVO" },
+  { id: "MOT-006", name: "Renato Oliveira", cpf: "60400000035", cnh: "08146372950", cnhCategory: "E", cnhExpiresAt: "2029-08-11", phone: "(13) 99245-6318", carrier: "Atlas Rodoviário", status: "ATIVO" },
+  { id: "MOT-007", name: "Fernanda Costa", cpf: "23800000064", cnh: "09275163840", cnhCategory: "E", cnhExpiresAt: "2028-12-02", phone: "(11) 97831-4406", carrier: "Baixada Cargas", status: "ATIVO" },
+  { id: "MOT-008", name: "Lucas Barreto", cpf: "87100000009", cnh: "06819452730", cnhCategory: "D", cnhExpiresAt: "2027-10-19", phone: "(13) 98720-3159", carrier: "Porto Sul", status: "ATIVO" },
+  { id: "MOT-009", name: "Patrícia Gomes", cpf: "14500000093", cnh: "07520941683", cnhCategory: "E", cnhExpiresAt: "2030-02-25", phone: "(13) 99564-8021", carrier: "Santos Express", status: "ATIVO" },
+  { id: "MOT-010", name: "Diego Martins", cpf: "52900000047", cnh: "08734629150", cnhCategory: "E", cnhExpiresAt: "2029-05-07", phone: "(11) 97418-5260", carrier: "Transmar Logística", status: "ATIVO" },
 ];
 
 const vehicles: Vehicle[] = [
   { id: "VEI-001", plate: "BRA2E19", type: "Cavalo mecânico", model: "Volvo FH 540", carrier: "Rota Litoral", renavam: "01482936175", capacityTons: 45, status: "DISPONÍVEL" },
   { id: "VEI-002", plate: "FRT7A42", type: "Carreta LS", model: "Scania R450", carrier: "Transmar Logística", renavam: "01372649580", capacityTons: 48, status: "EM_OPERAÇÃO" },
   { id: "VEI-003", plate: "GHT4B88", type: "Porta-contêiner", model: "Mercedes Actros", carrier: "Costa Transportes", renavam: "01263847591", capacityTons: 42, status: "MANUTENÇÃO" },
+  { id: "VEI-004", plate: "KPL9C31", type: "Cavalo mecânico", model: "DAF XF 530", carrier: "Eixo Sul Cargas", renavam: "01583726409", capacityTons: 46, status: "DISPONÍVEL" },
+  { id: "VEI-005", plate: "QWE5D70", type: "Carreta baú", model: "Iveco S-Way", carrier: "Navega Log", renavam: "01192837465", capacityTons: 40, status: "INATIVO" },
+  { id: "VEI-006", plate: "LMN3F21", type: "Porta-contêiner", model: "Volkswagen Meteor 29.520", carrier: "Atlas Rodoviário", renavam: "01630495827", capacityTons: 44, status: "EM_OPERAÇÃO" },
+  { id: "VEI-007", plate: "RST8G64", type: "Carreta sider", model: "Volvo FH 460", carrier: "Baixada Cargas", renavam: "01749263018", capacityTons: 43, status: "DISPONÍVEL" },
+  { id: "VEI-008", plate: "UVW1H92", type: "Bitrem graneleiro", model: "Scania G 410", carrier: "Porto Sul", renavam: "01857392046", capacityTons: 57, status: "MANUTENÇÃO" },
+  { id: "VEI-009", plate: "XYZ6J35", type: "Porta-contêiner", model: "Mercedes Axor 2544", carrier: "Santos Express", renavam: "01962840537", capacityTons: 45, status: "DISPONÍVEL" },
+  { id: "VEI-010", plate: "BCD4K78", type: "Carreta prancha", model: "DAF CF 450", carrier: "Rota Litoral", renavam: "01074951628", capacityTons: 50, status: "INATIVO" },
 ];
 
 const terminals: Terminal[] = [
   { id: "TER-001", name: "Terminal Atlântico", code: "TATL", location: "Margem Direita — Santos", gates: 4, openingTime: "06:00", closingTime: "23:00", hourlyCapacity: 18, status: "OPERACIONAL" },
   { id: "TER-002", name: "Pátio Alemoa", code: "PALE", location: "Alemoa — Santos", gates: 3, openingTime: "05:00", closingTime: "22:00", hourlyCapacity: 14, status: "OPERACIONAL" },
   { id: "TER-003", name: "Terminal Guarujá", code: "TGUA", location: "Margem Esquerda — Guarujá", gates: 2, openingTime: "07:00", closingTime: "21:00", hourlyCapacity: 10, status: "RESTRITO" },
+  { id: "TER-004", name: "Terminal Saboó", code: "TSAB", location: "Cais do Saboó — Santos", gates: 6, openingTime: "05:00", closingTime: "23:30", hourlyCapacity: 28, status: "OPERACIONAL" },
+  { id: "TER-005", name: "Pátio Cubatão", code: "PCUB", location: "Distrito Industrial — Cubatão", gates: 5, openingTime: "04:30", closingTime: "22:30", hourlyCapacity: 24, status: "OPERACIONAL" },
+  { id: "TER-006", name: "Terminal Conceiçãozinha", code: "TCON", location: "Vicente de Carvalho — Guarujá", gates: 3, openingTime: "06:30", closingTime: "20:30", hourlyCapacity: 12, status: "RESTRITO" },
+  { id: "TER-007", name: "Base Logística Anchieta", code: "BANC", location: "Rodovia Anchieta — Santos", gates: 2, openingTime: "07:00", closingTime: "19:00", hourlyCapacity: 8, status: "INATIVO" },
 ];
 
 interface DriverRow { id: string; name: string; cpf: string; cnh: string; cnh_category: "D" | "E"; cnh_expires_at: string; phone: string; carrier: string; status: DriverStatus }

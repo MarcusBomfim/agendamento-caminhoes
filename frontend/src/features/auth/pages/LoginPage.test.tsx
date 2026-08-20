@@ -26,11 +26,12 @@ describe("LoginPage", () => {
 
     const email = screen.getByLabelText("E-mail");
     const password = screen.getByLabelText("Senha");
+    expect(email).toHaveValue("");
+    expect(password).toHaveValue("");
+    expect(screen.queryByText("Acesso demonstrativo")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Esqueci minha senha" })).toHaveAttribute("href", "/recuperar-senha");
 
-    await user.clear(email);
     await user.type(email, "operador@portoagenda.com");
-    await user.clear(password);
     await user.type(password, "Senha@123");
     await user.click(screen.getByRole("button", { name: /entrar no sistema/i }));
 

@@ -1,0 +1,2 @@
+export const SEEDED_ADMIN_ID = "USR-ADMIN-001";
+export const LEGACY_DEMO_PASSWORD_HASH = "$2b$12$/4VbPrxq3rNdpCEb6HGqcuoyS8P55ax8TUVuXLi5nQDIRaYDItcSa";

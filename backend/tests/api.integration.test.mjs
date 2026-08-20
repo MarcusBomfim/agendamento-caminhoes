@@ -1,7 +1,17 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { after, before, test } from "node:test";
-import { handleRequest } from "../dist/app.js";
+
+const testPassword = "IntegrationOnly@2026";
+process.env.NODE_ENV = "test";
+process.env.JWT_SECRET = "integration-test-only-jwt-secret-with-more-than-32-characters";
+process.env.DEMO_USER_PASSWORD = testPassword;
+process.env.PASSWORD_RESET_EXPOSE_LINK = "true";
+
+const [{ handleRequest }, { clearRateLimitStore }] = await Promise.all([
+  import("../dist/app.js"),
+  import("../dist/shared/http/rate-limit.js"),
+]);
 
 let server;
 let baseUrl;
@@ -18,7 +28,7 @@ before(async () => {
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
   const address = server.address();
   baseUrl = `http://127.0.0.1:${address.port}`;
-  const login = await request("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: "admin@portoagenda.com", password: "Porto@123" }) });
+  const login = await request("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: "admin@portoagenda.com", password: testPassword }) });
   token = login.body.data.token;
 });
 
@@ -219,4 +229,22 @@ test("cria agendamento e aplica o fluxo de status", async () => {
   const confirmed = await request(`/api/appointments/${created.body.data.id}/status`, { method: "PATCH", headers: authorizedHeaders(), body: JSON.stringify({ status: "CONFIRMADO" }) });
   assert.equal(confirmed.response.status, 200);
   assert.equal(confirmed.body.data.status, "CONFIRMADO");
+});
+
+test("limita tentativas repetidas de autenticação", async () => {
+  clearRateLimitStore();
+  const options = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "inexistente@portoagenda.com", password: "senha-incorreta" }),
+  };
+
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    const result = await request("/api/auth/login", options);
+    assert.equal(result.response.status, 401);
+  }
+
+  const blocked = await request("/api/auth/login", options);
+  assert.equal(blocked.response.status, 429);
+  assert.ok(Number(blocked.response.headers.get("retry-after")) > 0);
 });

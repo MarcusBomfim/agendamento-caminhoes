@@ -10,7 +10,7 @@ Na raiz do projeto:
 Copy-Item .env.example .env
 ```
 
-Edite `.env` e defina valores próprios para a senha do PostgreSQL e para `JWT_SECRET`. Depois execute:
+Edite `.env` e defina valores próprios para `POSTGRES_PASSWORD`, `JWT_SECRET` e `DEMO_USER_PASSWORD`. A aplicação recusa a inicialização em produção quando encontra valores ausentes, previsíveis ou fracos. Depois execute:
 
 ```powershell
 docker compose up --build
@@ -27,7 +27,7 @@ Serviços locais:
 
 As migrações são aplicadas automaticamente pelo serviço `migrations` antes da API, inclusive quando o volume do PostgreSQL já existe.
 
-No Docker local, `PASSWORD_RESET_EXPOSE_LINK=true` apresenta o link de recuperação diretamente na tela. Isso facilita os testes sem contratar um serviço de e-mail.
+O Docker executa a API em modo de produção e mantém `PASSWORD_RESET_EXPOSE_LINK=false`. Dessa forma, tokens de redefinição não aparecem na resposta da API nem na interface.
 
 ## E-mail de recuperação
 
@@ -43,7 +43,7 @@ SMTP_PASSWORD=sua_senha
 SMTP_FROM=Porto Agenda <nao-responda@seudominio.com>
 ```
 
-Use a porta e a opção de segurança indicadas pelo seu provedor. Em produção, mantenha `PASSWORD_RESET_EXPOSE_LINK=false`, para que o token seja entregue somente pelo e-mail do usuário.
+Use a porta e a opção de segurança indicadas pelo seu provedor. Em produção, `PASSWORD_RESET_EXPOSE_LINK=true` é rejeitado pela validação de segurança, para que o token seja entregue somente pelo e-mail do usuário.
 
 Para encerrar os serviços:
 
@@ -58,10 +58,11 @@ Esse comando preserva os dados. A remoção do volume só deve ser feita quando 
 - Use HTTPS no front-end e na API.
 - Armazene senhas, URL do banco e chave JWT em variáveis secretas da plataforma.
 - Armazene também as credenciais SMTP como segredos e nunca as envie ao GitHub.
-- Troque o usuário e a senha demonstrativos antes da primeira publicação.
+- Use uma senha administrativa inédita, com pelo menos 12 caracteres, letras maiúsculas e minúsculas, número e símbolo.
 - Crie contas individuais e mantenha a função de administrador apenas para quem gerencia acessos.
 - Restrinja `FRONTEND_URL` ao endereço real da interface.
-- Ative `DATABASE_SSL=true` quando o provedor PostgreSQL exigir conexão segura.
+- Ative `DATABASE_SSL=true` quando o provedor PostgreSQL exigir conexão segura e mantenha `DATABASE_SSL_REJECT_UNAUTHORIZED=true`.
+- Só ative `TRUST_PROXY=true` quando a API estiver realmente atrás de um proxy confiável que substitui o cabeçalho `X-Forwarded-For`.
 - Utilize um banco gerenciado com backups automáticos.
 - Execute testes e builds antes de liberar uma nova versão.
 - Monitore erros, disponibilidade e uso de recursos.

@@ -25,4 +25,8 @@ export interface Route {
   handler: RouteHandler;
   protected?: boolean;
   roles?: UserRole[];
+  rateLimit?: {
+    limit: number;
+    windowMs: number;
+  };
 }

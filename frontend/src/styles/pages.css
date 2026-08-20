@@ -159,10 +159,6 @@
 .local-recovery-link { min-height: 42px; padding: 0 12px; border: 1px solid #b9d8eb; border-radius: 9px; background: var(--blue-pale); }
 .login-show-password { width: 29px; height: 29px; display: grid; flex: 0 0 29px; place-items: center; border: 0; background: transparent; color: var(--text-soft); }
 .login-password-rules { margin-top: 12px; color: var(--text-soft); font-size: 0.57rem; line-height: 1.5; }
-.demo-credentials { margin-top: 20px; padding: 12px; display: grid; gap: 4px; border-radius: 9px; background: var(--surface-soft); text-align: center; }
-.demo-credentials strong { color: var(--text-soft); font-size: 0.58rem; }
-.demo-credentials span { color: var(--text-faint); font-size: 0.56rem; }
-
 @media (max-width: 850px) {
   .login-page { grid-template-columns: 1fr; }
   .login-brand-panel { min-height: 300px; padding: 34px; }

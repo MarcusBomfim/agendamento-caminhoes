@@ -8,7 +8,7 @@ export const databaseEnabled = Boolean(env.DATABASE_URL);
 
 export const pool = env.DATABASE_URL ? new Pool({
   connectionString: env.DATABASE_URL,
-  ssl: useSsl ? { rejectUnauthorized: false } : undefined,
+  ssl: useSsl ? { rejectUnauthorized: env.DATABASE_SSL_REJECT_UNAUTHORIZED } : undefined,
   max: 10,
   idleTimeoutMillis: 30_000,
 }) : null;

@@ -9,8 +9,8 @@ export function LoginPage() {
   const { authenticated, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [email, setEmail] = useState("admin@portoagenda.com");
-  const [password, setPassword] = useState("Porto@123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -39,7 +39,6 @@ export function LoginPage() {
         <div className="login-password-tools"><Link to="/recuperar-senha">Esqueci minha senha</Link></div>
         {error && <div className="login-error" role="alert">{error}</div>}
         <button type="submit" disabled={submitting}>{submitting ? "Entrando..." : <>Entrar no sistema <ArrowRight size={17} /></>}</button>
-        <div className="demo-credentials"><strong>Acesso demonstrativo</strong><span>admin@portoagenda.com · Porto@123</span></div>
       </form>
     </AuthPageShell>
   );

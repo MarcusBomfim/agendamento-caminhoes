@@ -1,5 +1,11 @@
 import { createServer } from "node:http";
-import { handleRequest } from "../dist/app.js";
+
+const testPassword = "SmokeTestOnly@2026";
+process.env.NODE_ENV = "test";
+process.env.JWT_SECRET = "smoke-test-only-jwt-secret-with-more-than-32-characters";
+process.env.DEMO_USER_PASSWORD = testPassword;
+
+const { handleRequest } = await import("../dist/app.js");
 
 const server = createServer(handleRequest);
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
@@ -9,7 +15,7 @@ try {
   if (!address || typeof address === "string") throw new Error("Endereço de teste indisponível");
   const baseUrl = `http://127.0.0.1:${address.port}`;
   const healthResponse = await fetch(`${baseUrl}/api/health`);
-  const loginResponse = await fetch(`${baseUrl}/api/auth/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: "admin@portoagenda.com", password: "Porto@123" }) });
+  const loginResponse = await fetch(`${baseUrl}/api/auth/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: "admin@portoagenda.com", password: testPassword }) });
   if (!healthResponse.ok || !loginResponse.ok) throw new Error("Saúde ou autenticação respondeu com erro");
   const health = await healthResponse.json();
   const session = await loginResponse.json();

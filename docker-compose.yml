@@ -5,9 +5,9 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-porto_agenda}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/migrations:/docker-entrypoint-initdb.d:ro
@@ -25,15 +25,17 @@ services:
       PORT: 3333
       NODE_ENV: production
       FRONTEND_URL: http://localhost:8080
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-porto_agenda}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}@postgres:5432/${POSTGRES_DB:-porto_agenda}
       DATABASE_SSL: "false"
-      JWT_SECRET: ${JWT_SECRET:-porto-agenda-local-docker-secret-key-2026}
+      DATABASE_SSL_REJECT_UNAUTHORIZED: "true"
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET no arquivo .env}
       JWT_EXPIRES_IN: 8h
-      DEMO_USER_EMAIL: admin@portoagenda.com
-      DEMO_USER_PASSWORD: Porto@123
+      DEMO_USER_EMAIL: ${DEMO_USER_EMAIL:-admin@portoagenda.com}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:?Defina DEMO_USER_PASSWORD no arquivo .env}
       PASSWORD_RESET_EXPIRES_MINUTES: 30
       PASSWORD_RESET_COOLDOWN_SECONDS: 60
-      PASSWORD_RESET_EXPOSE_LINK: ${PASSWORD_RESET_EXPOSE_LINK:-true}
+      PASSWORD_RESET_EXPOSE_LINK: "false"
+      TRUST_PROXY: "false"
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_SECURE: ${SMTP_SECURE:-false}
@@ -41,7 +43,7 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_FROM: ${SMTP_FROM:-Porto Agenda <nao-responda@portoagenda.local>}
     ports:
-      - "3333:3333"
+      - "127.0.0.1:3333:3333"
     depends_on:
       migrations:
         condition: service_completed_successfully
@@ -56,7 +58,7 @@ services:
     environment:
       PGDATABASE: ${POSTGRES_DB:-porto_agenda}
       PGUSER: ${POSTGRES_USER:-postgres}
-      PGPASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}
       PGHOST: postgres
     volumes:
       - ./database/migrations:/migrations:ro
@@ -79,12 +81,12 @@ services:
         VITE_API_URL: http://localhost:3333/api
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     depends_on:
       backend:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost/ >/dev/null || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5

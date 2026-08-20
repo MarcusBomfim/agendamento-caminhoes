@@ -72,7 +72,7 @@ A senha deve ter pelo menos 10 caracteres, com letras maiúscula e minúscula, n
 ```json
 {
   "email": "admin@portoagenda.com",
-  "password": "Porto@123"
+  "password": "SuaSenhaForte@2026"
 }
 ```
 

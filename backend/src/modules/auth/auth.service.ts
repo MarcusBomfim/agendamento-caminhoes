@@ -5,6 +5,7 @@ import { env } from "../../config/env.ts";
 import { AppError } from "../../shared/errors/AppError.ts";
 import { createId } from "../../shared/utils/createId.ts";
 import { authRepository } from "./auth.repository.ts";
+import { LEGACY_DEMO_PASSWORD_HASH } from "./auth.constants.ts";
 import { sendPasswordResetEmail } from "./password-reset-email.service.ts";
 import type { AuthenticatedUser, ManagedUser, NewUser, User } from "./auth.types.ts";
 
@@ -20,10 +21,16 @@ function requireAdmin(user: AuthenticatedUser | undefined): asserts user is Auth
   if (!user || user.role !== "ADMIN") throw new AppError(403, "Acesso permitido somente para administradores");
 }
 
+async function waitForMinimumDuration(startedAt: number, minimumMs = 300) {
+  const remaining = minimumMs - (Date.now() - startedAt);
+  if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
+}
+
 export class AuthService {
   async login(email: string, password: string) {
     const user = await authRepository.findByEmail(email);
-    if (!user || !user.active || !(await compare(password, user.passwordHash))) throw new AppError(401, "E-mail ou senha inválidos");
+    const passwordMatches = await compare(password, user?.passwordHash ?? LEGACY_DEMO_PASSWORD_HASH);
+    if (!user || !user.active || !passwordMatches) throw new AppError(401, "E-mail ou senha inválidos");
 
     const token = jwt.sign({ role: user.role, email: user.email, version: user.tokenVersion }, env.JWT_SECRET, {
       subject: user.id,
@@ -31,6 +38,11 @@ export class AuthService {
       issuer: "porto-agenda-api",
     });
     return { token, user: publicUser(user) };
+  }
+
+  async initializeBootstrapAdmin() {
+    const passwordHash = await hash(env.DEMO_USER_PASSWORD, 12);
+    return authRepository.secureSeededAdmin(env.DEMO_USER_EMAIL, passwordHash);
   }
 
   async authenticate(token: string) {
@@ -81,12 +93,19 @@ export class AuthService {
   }
 
   async requestPasswordReset(email: string) {
+    const startedAt = Date.now();
     const response = { message: "Se o e-mail estiver cadastrado, você receberá as instruções para redefinir sua senha." };
     const user = await authRepository.findByEmail(email);
-    if (!user?.active) return response;
+    if (!user?.active) {
+      await waitForMinimumDuration(startedAt);
+      return response;
+    }
 
     const cooldownStart = new Date(Date.now() - env.PASSWORD_RESET_COOLDOWN_SECONDS * 1_000);
-    if (await authRepository.hasRecentResetToken(user.id, cooldownStart)) return response;
+    if (await authRepository.hasRecentResetToken(user.id, cooldownStart)) {
+      await waitForMinimumDuration(startedAt);
+      return response;
+    }
 
     const rawToken = randomBytes(32).toString("hex");
     const tokenHash = createHash("sha256").update(rawToken).digest("hex");
@@ -101,6 +120,7 @@ export class AuthService {
       console.error("Falha ao enviar e-mail de recuperação", error);
     }
 
+    await waitForMinimumDuration(startedAt);
     return env.NODE_ENV !== "production" || env.PASSWORD_RESET_EXPOSE_LINK ? { ...response, resetUrl: resetUrl.toString() } : response;
   }
 

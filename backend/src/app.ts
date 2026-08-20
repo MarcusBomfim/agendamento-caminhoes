@@ -8,6 +8,7 @@ import { registryRoutes } from "./modules/registries/registry.routes.ts";
 import { AppError } from "./shared/errors/AppError.ts";
 import { readJsonBody } from "./shared/http/body.ts";
 import { findRoute } from "./shared/http/router.ts";
+import { consumeRateLimit } from "./shared/http/rate-limit.ts";
 import type { Route } from "./shared/http/types.ts";
 
 const routes: Route[] = [
@@ -40,6 +41,12 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
     const url = new URL(request.url ?? "/", `http://${request.headers.host ?? "localhost"}`);
     const match = findRoute(routes, request.method ?? "GET", url.pathname);
     if (!match) throw new AppError(404, "Rota não encontrada");
+
+    const rateLimit = consumeRateLimit(request, match.route);
+    if (!rateLimit.allowed) {
+      response.setHeader("Retry-After", String(rateLimit.retryAfterSeconds));
+      throw new AppError(429, "Muitas tentativas. Aguarde antes de tentar novamente");
+    }
 
     const body = await readJsonBody(request);
     let user;

@@ -8,6 +8,8 @@ Sistema full stack para organizar o agendamento e o controle de caminhões em op
 - Cadastro administrativo de usuários e controle de acesso por função.
 - Senhas protegidas com hash bcrypt e política de senha forte.
 - Recuperação de senha via SMTP ou link local, com token temporário de uso único e revogação das sessões anteriores.
+- Limitação de tentativas nas rotas de login e recuperação de senha.
+- Validação obrigatória de segredos fortes antes da inicialização em produção.
 - Dashboard com indicadores da operação.
 - Cadastro, consulta e atualização de agendamentos.
 - Gestão de motoristas, veículos e terminais.
@@ -16,6 +18,8 @@ Sistema full stack para organizar o agendamento e o controle de caminhões em op
 - Persistência em PostgreSQL ou modo demonstrativo em memória.
 - Base demonstrativa ampliada com 10 motoristas, 10 veículos, 7 terminais e 18 agendamentos em diferentes estados operacionais.
 - Testes automatizados no front-end e na API.
+
+Todos os nomes, documentos, telefones, placas, empresas e demais registros incluídos na base demonstrativa são fictícios e destinados exclusivamente à apresentação do sistema.
 
 ## Tecnologias
 
@@ -55,6 +59,8 @@ Copy-Item .env.example .env
 npm.cmd run dev
 ```
 
+Antes de iniciar, preencha no arquivo `backend/.env` uma `JWT_SECRET` local e uma senha forte em `DEMO_USER_PASSWORD`. O arquivo real `.env` é ignorado pelo Git.
+
 A API ficará disponível em `http://localhost:3333`.
 
 O PostgreSQL é opcional no desenvolvimento. Para executar a API no modo demonstrativo em memória, remova ou deixe `DATABASE_URL` vazia no arquivo `backend/.env`. Para utilizar o banco, configure a conexão e execute:
@@ -86,20 +92,23 @@ Copy-Item .env.example .env
 docker compose up --build
 ```
 
-A interface ficará em `http://localhost:8080`, a API em `http://localhost:3333` e o PostgreSQL na porta `5432`. As migrações são aplicadas automaticamente antes da inicialização da API.
+Antes do segundo comando, edite `.env` e defina valores inéditos para `POSTGRES_PASSWORD`, `JWT_SECRET` e `DEMO_USER_PASSWORD`. Para gerar uma chave JWT aleatória no PowerShell:
+
+```powershell
+[Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(32)).ToLower()
+```
+
+A senha administrativa deve ter pelo menos 12 caracteres, incluindo letras maiúsculas e minúsculas, número e símbolo. A interface ficará em `http://localhost:8080`, a API em `http://localhost:3333` e o PostgreSQL na porta `5432`. As migrações são aplicadas automaticamente antes da inicialização da API.
 
 ## Acesso demonstrativo
 
-- E-mail: `admin@portoagenda.com`
-- Senha: `Porto@123`
+O e-mail inicial é definido por `DEMO_USER_EMAIL` e a senha somente por `DEMO_USER_PASSWORD`, no arquivo `.env` local. Nenhuma senha de acesso é publicada no repositório ou exibida na interface.
 
-Essas credenciais devem ser alteradas antes de uma publicação real.
-
-No ambiente Docker de demonstração, o link de recuperação pode ser exibido diretamente na interface. Para envio por e-mail, configure SMTP e mantenha `PASSWORD_RESET_EXPOSE_LINK=false`, conforme o guia de publicação.
+O usuário histórico da base é desativado pela migração e só volta a ficar ativo depois que a API substitui sua senha pelas credenciais fortes do ambiente. Em produção, links de recuperação nunca são devolvidos pela API; configure SMTP para entregá-los por e-mail.
 
 ## Testes e qualidade
 
-A API possui testes de integração para saúde, autenticação, autorização administrativa, usuários, recuperação de senha, revogação de sessões, validações e fluxo dos agendamentos:
+A API possui testes de integração para saúde, autenticação, limite de tentativas, autorização administrativa, usuários, recuperação de senha, revogação de sessões, validações e fluxo dos agendamentos:
 
 ```powershell
 cd backend

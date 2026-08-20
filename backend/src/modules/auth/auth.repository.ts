@@ -1,6 +1,7 @@
 import { hashSync } from "bcryptjs";
 import { env } from "../../config/env.ts";
 import { databaseEnabled, query } from "../../database/client.ts";
+import { LEGACY_DEMO_PASSWORD_HASH, SEEDED_ADMIN_ID } from "./auth.constants.ts";
 import type { PasswordResetToken, User, UserRole } from "./auth.types.ts";
 
 interface UserRow {
@@ -62,6 +63,19 @@ export class AuthRepository {
       [user.id, user.name, user.email, user.passwordHash, user.role, user.active],
     );
     return mapUser(result.rows[0]!);
+  }
+
+  async secureSeededAdmin(email: string, passwordHash: string) {
+    if (!databaseEnabled) return false;
+    const result = await query<{ id: string }>(
+      `UPDATE users
+       SET email = $1, password_hash = $2, role = 'ADMIN', active = TRUE,
+           token_version = token_version + 1, updated_at = NOW()
+       WHERE id = $3 AND password_hash = $4
+       RETURNING id`,
+      [email.toLowerCase(), passwordHash, SEEDED_ADMIN_ID, LEGACY_DEMO_PASSWORD_HASH],
+    );
+    return Boolean(result.rows[0]);
   }
 
   async updateActive(id: string, active: boolean) {

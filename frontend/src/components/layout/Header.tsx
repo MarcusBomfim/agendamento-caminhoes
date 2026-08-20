@@ -1,5 +1,6 @@
 import { Bell, CircleHelp, Menu } from "lucide-react";
 import { useLocation } from "react-router";
+import { useAuth } from "../../features/auth/useAuth";
 
 interface HeaderProps {
   onOpenMenu: () => void;
@@ -15,6 +16,7 @@ const pageInformation = [
 ];
 
 export function Header({ onOpenMenu }: HeaderProps) {
+  const { user } = useAuth();
   const { pathname } = useLocation();
   const currentPage = pageInformation.find((page) => pathname.startsWith(page.path))
     ?? pageInformation[pageInformation.length - 1];
@@ -35,7 +37,7 @@ export function Header({ onOpenMenu }: HeaderProps) {
 
       <div className="header-actions">
         <p className="current-date">{currentDate}</p>
-        <span className="operation-status"><i /> Operação online</span>
+        <span className={`operation-status ${user?.role === "VIEWER" ? "is-viewer" : ""}`}><i /> {user?.role === "VIEWER" ? "Somente leitura" : "Operação online"}</span>
         <button type="button" aria-label="Ajuda"><CircleHelp size={20} /></button>
         <button className="notification-button" type="button" aria-label="Notificações">
           <Bell size={20} /><span aria-hidden="true">3</span>
@@ -44,4 +46,3 @@ export function Header({ onOpenMenu }: HeaderProps) {
     </header>
   );
 }
-

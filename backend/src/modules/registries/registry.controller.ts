@@ -2,8 +2,20 @@ import type { RouteHandler } from "../../shared/http/types.ts";
 import { createDriverSchema, createTerminalSchema, createVehicleSchema, driverStatusSchema, terminalStatusSchema, vehicleStatusSchema } from "./registry.schemas.ts";
 import { registryService } from "./registry.service.ts";
 
-export const listDrivers: RouteHandler = async () => ({ body: { data: await registryService.listDrivers() } });
-export const listVehicles: RouteHandler = async () => ({ body: { data: await registryService.listVehicles() } });
+export const listDrivers: RouteHandler = async ({ user }) => {
+  const drivers = await registryService.listDrivers();
+  return {
+    body: {
+      data: user?.role === "VIEWER"
+        ? drivers.map((driver) => ({ ...driver, cpf: "***.***.***-**", cnh: "***********", phone: "(**) *****-****" }))
+        : drivers,
+    },
+  };
+};
+export const listVehicles: RouteHandler = async ({ user }) => {
+  const vehicles = await registryService.listVehicles();
+  return { body: { data: user?.role === "VIEWER" ? vehicles.map((vehicle) => ({ ...vehicle, renavam: "***********" })) : vehicles } };
+};
 export const listTerminals: RouteHandler = async () => ({ body: { data: await registryService.listTerminals() } });
 export const createDriver: RouteHandler = async ({ body }) => ({ status: 201, body: { data: await registryService.createDriver(createDriverSchema.parse(body)) } });
 export const createVehicle: RouteHandler = async ({ body }) => ({ status: 201, body: { data: await registryService.createVehicle(createVehicleSchema.parse(body)) } });

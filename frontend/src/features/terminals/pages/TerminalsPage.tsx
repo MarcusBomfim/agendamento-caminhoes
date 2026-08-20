@@ -10,6 +10,7 @@ import { RegistryToolbar } from "../../registries/components/RegistryToolbar";
 import type { TerminalFormValues } from "../../registries/types";
 import { normalizeSearch } from "../../registries/utils";
 import { useRegistry } from "../../registries/useRegistry";
+import { useAuth } from "../../auth/useAuth";
 
 const terminalSchema = z.object({
   name: z.string().trim().min(3, "Informe o nome do terminal"),
@@ -24,6 +25,8 @@ const terminalSchema = z.object({
 const defaultValues: TerminalFormValues = { name: "", code: "", location: "", gates: "", openingTime: "06:00", closingTime: "22:00", hourlyCapacity: "" };
 
 export function TerminalsPage() {
+  const { user } = useAuth();
+  const canEdit = user?.role !== "VIEWER";
   const { terminals, isLoading, error, createTerminal, toggleTerminalStatus } = useRegistry();
   const [formOpen, setFormOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -39,10 +42,10 @@ export function TerminalsPage() {
 
   return (
     <section className="registry-page">
-      <RegistryPageHeader eyebrow="CONFIGURAÇÕES" title="Terminais e janelas" description="Configure portões, horários de operação e capacidade de atendimento." icon={Warehouse} count={terminals.length} activeCount={terminals.filter((item) => item.status !== "INATIVO").length} activeLabel="Terminais habilitados" formOpen={formOpen} onToggleForm={() => formOpen ? closeForm() : setFormOpen(true)} />
+      <RegistryPageHeader eyebrow="CONFIGURAÇÕES" title="Terminais e janelas" description={canEdit ? "Configure portões, horários de operação e capacidade de atendimento." : "Consulte horários, acessos e capacidade dos terminais."} icon={Warehouse} count={terminals.length} activeCount={terminals.filter((item) => item.status !== "INATIVO").length} activeLabel="Terminais habilitados" formOpen={formOpen} onToggleForm={() => formOpen ? closeForm() : setFormOpen(true)} readOnly={!canEdit} />
       {isLoading && <div className="api-state-banner">Carregando terminais da API...</div>}{error && <div className="api-state-banner is-error">{error}</div>}
 
-      {formOpen && <RegistryFormPanel title="Cadastrar terminal" description="Configure a localização e os limites operacionais do novo terminal." onCancel={closeForm}>
+      {canEdit && formOpen && <RegistryFormPanel title="Cadastrar terminal" description="Configure a localização e os limites operacionais do novo terminal." onCancel={closeForm}>
         <form onSubmit={handleSubmit(submit)} noValidate><div className="registry-form-grid">
           <label className="registry-field registry-field-wide"><span>Nome do terminal *</span><input autoFocus {...register("name")} /><RegistryFieldError message={errors.name?.message} /></label>
           <label className="registry-field"><span>Código *</span><input placeholder="TATL" {...register("code")} /><RegistryFieldError message={errors.code?.message} /></label>
@@ -60,7 +63,7 @@ export function TerminalsPage() {
             <header><div className="terminal-card-icon"><Warehouse size={20} /></div><div><span>{terminal.code}</span><h3>{terminal.name}</h3></div><RegistryStatus status={terminal.status} /></header>
             <div className="terminal-location"><MapPin size={15} /><span>{terminal.location}</span></div>
             <div className="terminal-metrics"><div><Clock3 size={16} /><span>Funcionamento<strong>{terminal.openingTime}–{terminal.closingTime}</strong></span></div><div><Gauge size={16} /><span>Capacidade<strong>{terminal.hourlyCapacity} caminhões/h</strong></span></div><div><Warehouse size={16} /><span>Acessos<strong>{terminal.gates} portões</strong></span></div></div>
-            <footer><span>{terminal.id}</span><button type="button" onClick={() => toggleTerminalStatus(terminal.id)}>{terminal.status === "INATIVO" ? <RotateCcw size={15} /> : <Power size={15} />}{terminal.status === "INATIVO" ? "Reativar" : "Desativar"}</button></footer>
+            <footer><span>{terminal.id}</span>{canEdit && <button type="button" onClick={() => toggleTerminalStatus(terminal.id)}>{terminal.status === "INATIVO" ? <RotateCcw size={15} /> : <Power size={15} />}{terminal.status === "INATIVO" ? "Reativar" : "Desativar"}</button>}</footer>
           </article>)}
         </div>{filteredTerminals.length === 0 && <div className="registry-empty"><Warehouse size={25} /><strong>Nenhum terminal encontrado</strong><span>Tente pesquisar por outro termo.</span></div>}
       </div>

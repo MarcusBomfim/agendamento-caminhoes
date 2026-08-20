@@ -5,6 +5,7 @@ Sistema full stack para organizar o agendamento e o controle de caminhões em op
 ## Funcionalidades
 
 - Autenticação de operadores com JWT.
+- Entrada demonstrativa por visitante, sem senha e com acesso somente para leitura.
 - Cadastro administrativo de usuários e controle de acesso por função.
 - Senhas protegidas com hash bcrypt e política de senha forte.
 - Recuperação de senha via SMTP ou link local, com token temporário de uso único e revogação das sessões anteriores.
@@ -102,7 +103,9 @@ A senha administrativa deve ter pelo menos 12 caracteres, incluindo letras maiú
 
 ## Acesso demonstrativo
 
-O e-mail inicial é definido por `DEMO_USER_EMAIL` e a senha somente por `DEMO_USER_PASSWORD`, no arquivo `.env` local. Nenhuma senha de acesso é publicada no repositório ou exibida na interface.
+Na tela de login, selecione **Explorar como visitante**. Esse acesso não exige cadastro ou senha e permite consultar dashboard, agendamentos, motoristas, veículos e terminais. Cadastros, alterações de status e administração de usuários são bloqueados pela API. Documentos pessoais e RENAVAM também são mascarados para visitantes.
+
+O acesso administrativo permanece separado: o e-mail inicial é definido por `DEMO_USER_EMAIL` e a senha somente por `DEMO_USER_PASSWORD`, no arquivo `.env` local. Nenhuma senha administrativa é publicada no repositório ou exibida na interface. O modo visitante pode ser desligado com `DEMO_VISITOR_ENABLED=false`.
 
 O usuário histórico da base é desativado pela migração e só volta a ficar ativo depois que a API substitui sua senha pelas credenciais fortes do ambiente. Em produção, links de recuperação nunca são devolvidos pela API; configure SMTP para entregá-los por e-mail.
 

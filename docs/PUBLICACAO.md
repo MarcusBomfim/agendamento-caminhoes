@@ -16,6 +16,8 @@ Edite `.env` e defina valores próprios para `POSTGRES_PASSWORD`, `JWT_SECRET` e
 docker compose up --build
 ```
 
+Para disponibilizar a demonstração somente leitura do portfólio, mantenha `DEMO_VISITOR_ENABLED=true`. Esse modo não revela a senha administrativa e bloqueia operações de escrita no servidor. Use `false` quando não quiser oferecer acesso público.
+
 Serviços locais:
 
 | Serviço | Endereço |

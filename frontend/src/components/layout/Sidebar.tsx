@@ -31,7 +31,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
         <div className="sidebar-section-label">OPERAÇÃO</div>
         <nav className="sidebar-navigation">
-          {navigationItems.filter((item) => !item.adminOnly || user?.role === "ADMIN").map(({ label, path, icon: Icon, end }) => (
+          {navigationItems.filter((item) => (!item.adminOnly || user?.role === "ADMIN") && (!item.editOnly || user?.role !== "VIEWER")).map(({ label, path, icon: Icon, end }) => (
             <NavLink
               key={path}
               to={path}
@@ -47,7 +47,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
         <div className="sidebar-account">
           <div className="account-avatar" aria-hidden="true">{initials}</div>
-          <div><strong>{user?.name ?? "Operador"}</strong><small>{user?.role === "ADMIN" ? "Administrador" : "Operador"}</small></div>
+          <div><strong>{user?.name ?? "Operador"}</strong><small>{user?.role === "ADMIN" ? "Administrador" : user?.role === "VIEWER" ? "Visitante · somente leitura" : "Operador"}</small></div>
           <button type="button" aria-label="Sair do sistema" title="Sair" onClick={logout}><LogOut size={18} /></button>
         </div>
       </aside>

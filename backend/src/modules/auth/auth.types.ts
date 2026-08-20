@@ -1,4 +1,4 @@
-export type UserRole = "ADMIN" | "OPERATOR";
+export type UserRole = "ADMIN" | "OPERATOR" | "VIEWER";
 
 export interface User {
   id: string;
@@ -17,7 +17,7 @@ export interface NewUser {
   name: string;
   email: string;
   password: string;
-  role: UserRole;
+  role: Exclude<UserRole, "VIEWER">;
 }
 
 export interface PasswordResetToken {

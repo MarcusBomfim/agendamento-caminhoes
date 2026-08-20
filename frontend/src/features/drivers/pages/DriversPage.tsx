@@ -10,6 +10,7 @@ import { RegistryToolbar } from "../../registries/components/RegistryToolbar";
 import type { DriverFormValues } from "../../registries/types";
 import { formatRegistryDate, normalizeSearch } from "../../registries/utils";
 import { useRegistry } from "../../registries/useRegistry";
+import { useAuth } from "../../auth/useAuth";
 
 const driverSchema = z.object({
   name: z.string().trim().min(3, "Informe o nome completo"),
@@ -24,6 +25,8 @@ const driverSchema = z.object({
 const defaultValues: DriverFormValues = { name: "", cpf: "", cnh: "", cnhCategory: "", cnhExpiresAt: "", phone: "", carrier: "" };
 
 export function DriversPage() {
+  const { user } = useAuth();
+  const canEdit = user?.role !== "VIEWER";
   const { drivers, isLoading, error, createDriver, toggleDriverStatus } = useRegistry();
   const [formOpen, setFormOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -39,10 +42,10 @@ export function DriversPage() {
 
   return (
     <section className="registry-page">
-      <RegistryPageHeader eyebrow="CADASTROS" title="Motoristas autorizados" description="Mantenha documentos, contatos e situação dos motoristas atualizados." icon={UsersRound} count={drivers.length} activeCount={drivers.filter((item) => item.status === "ATIVO").length} activeLabel="Motoristas ativos" formOpen={formOpen} onToggleForm={() => formOpen ? closeForm() : setFormOpen(true)} />
+      <RegistryPageHeader eyebrow="CADASTROS" title="Motoristas autorizados" description={canEdit ? "Mantenha documentos, contatos e situação dos motoristas atualizados." : "Consulte os motoristas e suas informações operacionais."} icon={UsersRound} count={drivers.length} activeCount={drivers.filter((item) => item.status === "ATIVO").length} activeLabel="Motoristas ativos" formOpen={formOpen} onToggleForm={() => formOpen ? closeForm() : setFormOpen(true)} readOnly={!canEdit} />
       {isLoading && <div className="api-state-banner">Carregando motoristas da API...</div>}{error && <div className="api-state-banner is-error">{error}</div>}
 
-      {formOpen && <RegistryFormPanel title="Cadastrar motorista" description="Preencha os dados pessoais e a habilitação do profissional." onCancel={closeForm}>
+      {canEdit && formOpen && <RegistryFormPanel title="Cadastrar motorista" description="Preencha os dados pessoais e a habilitação do profissional." onCancel={closeForm}>
         <form onSubmit={handleSubmit(submit)} noValidate><div className="registry-form-grid">
           <label className="registry-field registry-field-wide"><span>Nome completo *</span><input autoFocus {...register("name")} /><RegistryFieldError message={errors.name?.message} /></label>
           <label className="registry-field"><span>CPF *</span><input placeholder="000.000.000-00" {...register("cpf")} /><RegistryFieldError message={errors.cpf?.message} /></label>
@@ -55,8 +58,8 @@ export function DriversPage() {
       </RegistryFormPanel>}
 
       <div className="registry-list-card"><RegistryToolbar value={search} onChange={setSearch} placeholder="Pesquisar por nome, CPF, CNH ou transportadora" count={filteredDrivers.length} />
-        <div className="registry-table-scroll"><table className="registry-table"><caption className="sr-only">Motoristas cadastrados</caption><thead><tr><th>Motorista</th><th>Documentos</th><th>Contato</th><th>Transportadora</th><th>Status</th><th><span className="sr-only">Ações</span></th></tr></thead><tbody>
-          {filteredDrivers.map((driver) => <tr key={driver.id}><td><strong>{driver.name}</strong><small>{driver.id}</small></td><td><strong>CNH {driver.cnh} · {driver.cnhCategory}</strong><small>Validade {formatRegistryDate(driver.cnhExpiresAt)} · {driver.cpf}</small></td><td><strong>{driver.phone}</strong></td><td><strong>{driver.carrier}</strong></td><td><RegistryStatus status={driver.status} /></td><td><button className="registry-row-action" type="button" onClick={() => toggleDriverStatus(driver.id)} title={driver.status === "ATIVO" ? "Desativar" : "Reativar"}>{driver.status === "ATIVO" ? <Power size={16} /> : <RotateCcw size={16} />}</button></td></tr>)}
+        <div className="registry-table-scroll"><table className="registry-table"><caption className="sr-only">Motoristas cadastrados</caption><thead><tr><th>Motorista</th><th>Documentos</th><th>Contato</th><th>Transportadora</th><th>Status</th>{canEdit && <th><span className="sr-only">Ações</span></th>}</tr></thead><tbody>
+          {filteredDrivers.map((driver) => <tr key={driver.id}><td><strong>{driver.name}</strong><small>{driver.id}</small></td><td><strong>CNH {driver.cnh} · {driver.cnhCategory}</strong><small>Validade {formatRegistryDate(driver.cnhExpiresAt)} · {driver.cpf}</small></td><td><strong>{driver.phone}</strong></td><td><strong>{driver.carrier}</strong></td><td><RegistryStatus status={driver.status} /></td>{canEdit && <td><button className="registry-row-action" type="button" onClick={() => toggleDriverStatus(driver.id)} title={driver.status === "ATIVO" ? "Desativar" : "Reativar"}>{driver.status === "ATIVO" ? <Power size={16} /> : <RotateCcw size={16} />}</button></td>}</tr>)}
         </tbody></table>{filteredDrivers.length === 0 && <div className="registry-empty"><UsersRound size={25} /><strong>Nenhum motorista encontrado</strong><span>Tente pesquisar por outro termo.</span></div>}</div>
       </div>
     </section>

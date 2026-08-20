@@ -7,6 +7,7 @@ export const login: RouteHandler = async ({ body }) => {
   return { body: { data: await authService.login(credentials.email, credentials.password) } };
 };
 
+export const demoLogin: RouteHandler = () => ({ body: { data: authService.demoLogin() } });
 export const me: RouteHandler = ({ user }) => ({ body: { data: user } });
 export const listUsers: RouteHandler = async ({ user }) => ({ body: { data: await authService.listUsers(user) } });
 export const createUser: RouteHandler = async ({ user, body }) => ({ status: 201, body: { data: await authService.createUser(user, createUserSchema.parse(body)) } });

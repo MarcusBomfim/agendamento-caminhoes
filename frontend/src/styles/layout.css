@@ -239,6 +239,16 @@
   box-shadow: 0 0 0 4px rgba(46, 157, 105, 0.11);
 }
 
+.operation-status.is-viewer {
+  background: #e8f1fb;
+  color: #176da8;
+}
+
+.operation-status.is-viewer i {
+  background: #2386c8;
+  box-shadow: 0 0 0 4px rgba(35, 134, 200, 0.11);
+}
+
 .header-actions > button,
 .menu-button {
   width: 40px;
@@ -285,4 +295,3 @@
   margin: 0 auto;
   padding: clamp(30px, 4vw, 50px) 0 70px;
 }
-

@@ -15,12 +15,13 @@ export interface NavigationItem {
   icon: LucideIcon;
   end?: boolean;
   adminOnly?: boolean;
+  editOnly?: boolean;
 }
 
 export const navigationItems: NavigationItem[] = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, end: true },
   { label: "Agendamentos", path: "/agendamentos", icon: CalendarDays, end: true },
-  { label: "Novo agendamento", path: "/agendamentos/novo", icon: CalendarPlus },
+  { label: "Novo agendamento", path: "/agendamentos/novo", icon: CalendarPlus, editOnly: true },
   { label: "Motoristas", path: "/motoristas", icon: UsersRound },
   { label: "Veículos", path: "/veiculos", icon: Truck },
   { label: "Terminais", path: "/terminais", icon: Warehouse },

@@ -5,7 +5,7 @@ import { env } from "../../config/env.ts";
 import { AppError } from "../../shared/errors/AppError.ts";
 import { createId } from "../../shared/utils/createId.ts";
 import { authRepository } from "./auth.repository.ts";
-import { LEGACY_DEMO_PASSWORD_HASH } from "./auth.constants.ts";
+import { DEMO_VISITOR, LEGACY_DEMO_PASSWORD_HASH } from "./auth.constants.ts";
 import { sendPasswordResetEmail } from "./password-reset-email.service.ts";
 import type { AuthenticatedUser, ManagedUser, NewUser, User } from "./auth.types.ts";
 
@@ -27,17 +27,26 @@ async function waitForMinimumDuration(startedAt: number, minimumMs = 300) {
 }
 
 export class AuthService {
+  private createSession(user: AuthenticatedUser, tokenVersion: number) {
+    const token = jwt.sign({ role: user.role, email: user.email, version: tokenVersion }, env.JWT_SECRET, {
+      subject: user.id,
+      expiresIn: env.JWT_EXPIRES_IN as SignOptions["expiresIn"],
+      issuer: "porto-agenda-api",
+    });
+    return { token, user };
+  }
+
   async login(email: string, password: string) {
     const user = await authRepository.findByEmail(email);
     const passwordMatches = await compare(password, user?.passwordHash ?? LEGACY_DEMO_PASSWORD_HASH);
     if (!user || !user.active || !passwordMatches) throw new AppError(401, "E-mail ou senha inválidos");
 
-    const token = jwt.sign({ role: user.role, email: user.email, version: user.tokenVersion }, env.JWT_SECRET, {
-      subject: user.id,
-      expiresIn: env.JWT_EXPIRES_IN as SignOptions["expiresIn"],
-      issuer: "porto-agenda-api",
-    });
-    return { token, user: publicUser(user) };
+    return this.createSession(publicUser(user), user.tokenVersion);
+  }
+
+  demoLogin() {
+    if (!env.DEMO_VISITOR_ENABLED) throw new AppError(404, "Demonstração indisponível");
+    return this.createSession(DEMO_VISITOR, 0);
   }
 
   async initializeBootstrapAdmin() {
@@ -49,6 +58,10 @@ export class AuthService {
     try {
       const payload = jwt.verify(token, env.JWT_SECRET, { issuer: "porto-agenda-api" });
       if (typeof payload === "string" || !payload.sub) throw new Error("Token sem usuário");
+      if (payload.sub === DEMO_VISITOR.id) {
+        if (!env.DEMO_VISITOR_ENABLED || payload.role !== "VIEWER" || payload.version !== 0) throw new Error("Sessão de visitante inválida");
+        return DEMO_VISITOR;
+      }
       const user = await authRepository.findById(payload.sub);
       if (!user || !user.active || payload.version !== user.tokenVersion) throw new Error("Sessão revogada");
       return publicUser(user);

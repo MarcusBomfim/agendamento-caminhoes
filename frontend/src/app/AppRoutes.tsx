@@ -12,6 +12,7 @@ import { AdminRoute } from "../features/auth/AdminRoute";
 import { UsersPage } from "../features/users/pages/UsersPage";
 import { ForgotPasswordPage } from "../features/auth/pages/ForgotPasswordPage";
 import { ResetPasswordPage } from "../features/auth/pages/ResetPasswordPage";
+import { EditorRoute } from "../features/auth/EditorRoute";
 
 export function AppRoutes() {
   return (
@@ -23,7 +24,9 @@ export function AppRoutes() {
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/agendamentos" element={<AppointmentsPage />} />
-          <Route path="/agendamentos/novo" element={<NewAppointmentPage />} />
+          <Route element={<EditorRoute />}>
+            <Route path="/agendamentos/novo" element={<NewAppointmentPage />} />
+          </Route>
           <Route path="/motoristas" element={<DriversPage />} />
           <Route path="/veiculos" element={<VehiclesPage />} />
           <Route path="/terminais" element={<TerminalsPage />} />

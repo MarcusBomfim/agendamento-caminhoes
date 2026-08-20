@@ -76,6 +76,14 @@ A senha deve ter pelo menos 10 caracteres, com letras maiúscula e minúscula, n
 }
 ```
 
+### Acesso demonstrativo
+
+```http
+POST /api/auth/demo
+```
+
+Retorna uma sessão temporária com função `VIEWER`. Esse perfil pode utilizar os endpoints de consulta, mas recebe `403` em qualquer operação de cadastro, alteração de status ou administração. Dados documentais dos cadastros são mascarados nas respostas destinadas ao visitante.
+
 ## Saúde da aplicação
 
 | Método | Endpoint | Descrição |

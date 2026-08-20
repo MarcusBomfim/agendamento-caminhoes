@@ -30,6 +30,7 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default("8h"),
   DEMO_USER_EMAIL: z.string().email().default("admin@portoagenda.com"),
   DEMO_USER_PASSWORD: z.string().min(10),
+  DEMO_VISITOR_ENABLED: z.enum(["true", "false"]).default("true").transform((value) => value === "true"),
   PASSWORD_RESET_EXPIRES_MINUTES: z.coerce.number().int().min(5).max(120).default(30),
   PASSWORD_RESET_COOLDOWN_SECONDS: z.coerce.number().int().min(30).max(3600).default(60),
   PASSWORD_RESET_EXPOSE_LINK: z.enum(["true", "false"]).default("false").transform((value) => value === "true"),

@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router";
 import { AppointmentFilters, type AppointmentFilterValues } from "../components/AppointmentFilters";
 import { AppointmentsTable } from "../components/AppointmentsTable";
 import { useAppointments } from "../useAppointments";
+import { useAuth } from "../../auth/useAuth";
 
 const emptyFilters: AppointmentFilterValues = {
   search: "",
@@ -17,6 +18,8 @@ function normalize(value: string) {
 }
 
 export function AppointmentsPage() {
+  const { user } = useAuth();
+  const canEdit = user?.role !== "VIEWER";
   const { appointments, isLoading, error, updateAppointmentStatus } = useAppointments();
   const location = useLocation();
   const [filters, setFilters] = useState<AppointmentFilterValues>(emptyFilters);
@@ -48,7 +51,7 @@ export function AppointmentsPage() {
           <h2>Gestão de agendamentos</h2>
           <p>Consulte, filtre e acompanhe cada janela operacional em um único lugar.</p>
         </div>
-        <Link className="primary-action" to="/agendamentos/novo"><Plus size={17} /> Novo agendamento</Link>
+        {canEdit && <Link className="primary-action" to="/agendamentos/novo"><Plus size={17} /> Novo agendamento</Link>}
       </div>
 
       {createdId && <div className="appointment-success"><CalendarDays size={18} /><p>Agendamento <strong>{createdId}</strong> criado com sucesso.</p></div>}
@@ -61,7 +64,7 @@ export function AppointmentsPage() {
           <strong>{filteredAppointments.length}</strong>
         </div>
         <AppointmentFilters filters={filters} onChange={setFilters} onClear={() => setFilters(emptyFilters)} />
-        <AppointmentsTable appointments={filteredAppointments} onStatusChange={(id, status) => { void updateAppointmentStatus(id, status); }} onClearFilters={() => setFilters(emptyFilters)} />
+        <AppointmentsTable appointments={filteredAppointments} onStatusChange={(id, status) => { void updateAppointmentStatus(id, status); }} onClearFilters={() => setFilters(emptyFilters)} readOnly={!canEdit} />
       </div>
     </section>
   );

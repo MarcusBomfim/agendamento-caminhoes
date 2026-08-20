@@ -4,6 +4,6 @@ import { createAppointment, getAppointment, listAppointments, updateAppointmentS
 export const appointmentRoutes: Route[] = [
   { method: "GET", path: "/api/appointments", handler: listAppointments, protected: true },
   { method: "GET", path: "/api/appointments/:id", handler: getAppointment, protected: true },
-  { method: "POST", path: "/api/appointments", handler: createAppointment, protected: true },
-  { method: "PATCH", path: "/api/appointments/:id/status", handler: updateAppointmentStatus, protected: true },
+  { method: "POST", path: "/api/appointments", handler: createAppointment, protected: true, roles: ["ADMIN", "OPERATOR"] },
+  { method: "PATCH", path: "/api/appointments/:id/status", handler: updateAppointmentStatus, protected: true, roles: ["ADMIN", "OPERATOR"] },
 ];

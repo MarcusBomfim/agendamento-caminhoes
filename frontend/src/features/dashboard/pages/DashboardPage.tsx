@@ -8,8 +8,11 @@ import { StatCard } from "../components/StatCard";
 import { StatusPanel } from "../components/StatusPanel";
 import { UpcomingAppointments } from "../components/UpcomingAppointments";
 import type { DashboardStat, StatusSummary, TerminalCapacity, UpcomingAppointment } from "../types";
+import { useAuth } from "../../auth/useAuth";
 
 export function DashboardPage() {
+  const { user } = useAuth();
+  const isViewer = user?.role === "VIEWER";
   const { appointments, isLoading } = useAppointments();
   const { terminals } = useRegistry();
   const today = new Date().toISOString().slice(0, 10);
@@ -38,8 +41,8 @@ export function DashboardPage() {
     .map((item) => ({ id: item.id, time: item.scheduledTime, carrier: item.carrier, driver: item.driver, plate: item.vehiclePlate, terminal: item.terminal, operation: item.operation === "IMPORTAÇÃO" ? "Importação" : "Exportação", status: item.status === "EM_PÁTIO" ? "EM PÁTIO" : item.status }));
 
   return <section className="dashboard-page">
-    <div className="dashboard-intro"><div><span>CONTROLE OPERACIONAL</span><h2>Operação de hoje</h2><p>Acompanhe o fluxo de caminhões, as janelas disponíveis e os pontos de atenção.</p></div><div className="dashboard-actions"><button type="button" className="secondary-action"><Download size={17} /> Exportar relatório</button><Link className="primary-action" to="/agendamentos/novo"><Plus size={18} /> Novo agendamento</Link></div></div>
-    <div className="demo-notice"><span>{isLoading ? "Sincronizando" : "API integrada"}</span><p>{isLoading ? "Carregando os dados operacionais..." : "Informações atualizadas pelo serviço do Porto Agenda."}</p></div>
+    <div className="dashboard-intro"><div><span>CONTROLE OPERACIONAL</span><h2>Operação de hoje</h2><p>Acompanhe o fluxo de caminhões, as janelas disponíveis e os pontos de atenção.</p></div><div className="dashboard-actions"><button type="button" className="secondary-action"><Download size={17} /> Exportar relatório</button>{!isViewer && <Link className="primary-action" to="/agendamentos/novo"><Plus size={18} /> Novo agendamento</Link>}</div></div>
+    <div className="demo-notice"><span>{isViewer ? "Modo visitante" : isLoading ? "Sincronizando" : "API integrada"}</span><p>{isViewer ? "Você pode explorar os dados demonstrativos sem alterar a operação." : isLoading ? "Carregando os dados operacionais..." : "Informações atualizadas pelo serviço do Porto Agenda."}</p></div>
     <div className="stats-grid">{stats.map((stat) => <StatCard stat={stat} key={stat.label} />)}</div>
     <div className="dashboard-grid"><CapacityPanel terminalCapacities={capacities} /><StatusPanel statusSummary={statuses} /></div>
     <div className="dashboard-grid dashboard-grid-bottom"><UpcomingAppointments upcomingAppointments={upcoming} /><AlertsPanel /></div>

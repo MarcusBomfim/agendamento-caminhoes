@@ -1,8 +1,9 @@
 import type { Route } from "../../shared/http/types.ts";
-import { createUser, forgotPassword, listUsers, login, me, resetPassword, updateUserStatus } from "./auth.controller.ts";
+import { createUser, demoLogin, forgotPassword, listUsers, login, me, resetPassword, updateUserStatus } from "./auth.controller.ts";
 
 export const authRoutes: Route[] = [
   { method: "POST", path: "/api/auth/login", handler: login, rateLimit: { limit: 10, windowMs: 15 * 60_000 } },
+  { method: "POST", path: "/api/auth/demo", handler: demoLogin, rateLimit: { limit: 30, windowMs: 15 * 60_000 } },
   { method: "POST", path: "/api/auth/forgot-password", handler: forgotPassword, rateLimit: { limit: 5, windowMs: 15 * 60_000 } },
   { method: "POST", path: "/api/auth/reset-password", handler: resetPassword, rateLimit: { limit: 10, windowMs: 15 * 60_000 } },
   { method: "GET", path: "/api/auth/me", handler: me, protected: true },

@@ -32,6 +32,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(session.user);
   }, []);
 
-  const value = useMemo(() => ({ user, authenticated: Boolean(user && getAccessToken()), login, logout }), [user, login, logout]);
+  const demoLogin = useCallback(async () => {
+    const session = await apiRequest<AuthSession>("/auth/demo", { method: "POST" });
+    setAccessToken(session.token);
+    window.localStorage.setItem(USER_KEY, JSON.stringify(session.user));
+    setUser(session.user);
+  }, []);
+
+  const value = useMemo(() => ({ user, authenticated: Boolean(user && getAccessToken()), login, demoLogin, logout }), [user, login, demoLogin, logout]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

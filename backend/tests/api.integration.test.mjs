@@ -59,6 +59,27 @@ test("protege os dados operacionais", async () => {
   assert.equal(authenticated.body.data.email, "admin@portoagenda.com");
 });
 
+test("permite demonstração somente leitura para visitantes", async () => {
+  const demo = await request("/api/auth/demo", { method: "POST" });
+  assert.equal(demo.response.status, 200);
+  assert.equal(demo.body.data.user.role, "VIEWER");
+  const visitorHeaders = authorizedHeaders(demo.body.data.token);
+
+  const drivers = await request("/api/drivers", { headers: visitorHeaders });
+  assert.equal(drivers.response.status, 200);
+  assert.equal(drivers.body.data[0].cpf, "***.***.***-**");
+  assert.equal(drivers.body.data[0].cnh, "***********");
+
+  const createDriver = await request("/api/drivers", { method: "POST", headers: visitorHeaders, body: JSON.stringify({}) });
+  assert.equal(createDriver.response.status, 403);
+
+  const changeAppointment = await request("/api/appointments/PA-DEMO-101/status", { method: "PATCH", headers: visitorHeaders, body: JSON.stringify({ status: "CANCELADO" }) });
+  assert.equal(changeAppointment.response.status, 403);
+
+  const users = await request("/api/users", { headers: visitorHeaders });
+  assert.equal(users.response.status, 403);
+});
+
 test("cadastra usuários com senha protegida e restringe a administração", async () => {
   const weakPassword = await request("/api/users", {
     method: "POST",
